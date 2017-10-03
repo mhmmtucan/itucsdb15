@@ -1,15 +1,118 @@
 <!DOCTYPE html>
-<html>
-  <head>
-    <meta charset="utf-8" />
-    <title>Home</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
-  </head>
-  <body>
-    <h1>Hello, Flask!</h1>
 
-    <footer>
-      <div id="datetime">{{ current_time }}</div>
-    </footer>
-  </body>
+<html lang="en">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="Quote Generator API and demo site">
+    <meta name="author" content="Muhammet Uçan">
+    <link rel="icon" href="https://v4-alpha.getbootstrap.com/favicon.ico">
+    <link rel="stylesheet" href="http://netdna.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+    <title>Quote Generator</title>
+
+    <!-- Custom styles for this template -->
+
+
+    <!-- Bootstrap core CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='/css/bootstrap.min.css') }}"/>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='/cover.css') }}"/>
+
+<body>
+
+<div class="site-wrapper">
+
+    <div class="site-wrapper-inner">
+
+        <div class="cover-container">
+
+            <div class="masthead clearfix">
+                <div class="inner">
+                    <a class="lead masthead-brand" style="text-decoration: none; font-size: x-large"
+                       href="{{ url_for('keyword') }}/">Quote Generator</a>
+                    <nav class="nav nav-masthead">
+                        <!-- http://itucsdb1741.mybluemix.net/ -->
+                        <a class="nav-link" href="{{ url_for('keyword') }}/random">Random</a>
+                        <a class="nav-link" href="{{ url_for('keyword') }}/about">About</a>
+                        <a class="nav-link" href="{{ url_for('keyword') }}/authentication">Auth</a>
+                    </nav>
+                </div>
+            </div>
+
+            <div class="inner cover">
+                <form action=" {{ url_for('keyword') }} " method="post">
+                    <p id="quote-id" hidden> {{ quote_id }}</p>
+                    <h1 class="cover-heading"> {{ writer }}</h1>
+                    <p class="lead"> {{ quote }} </p>
+                    <div class="form-group">
+                        <input type="text" class="form-control" id="keyword" aria-describedby="keywordHelp"
+                               name="keyword" value="{{ keyword_value }}"
+                               placeholder="Enter keyword like: humor, funny, wisdom, inspirational, success">
+                        <small id="keywordHelp" class="form-text text-muted">Your keyword may not exists in database.
+                            Please be gentle.
+                        </small>
+
+                    </div>
+                    <button type="submit" class="btn btn-secondary" name="btn" value="Generate">Generate</button>
+                </form>
+                <br>
+                <br>
+
+                <div class="stars">
+                    <div id="thankYou" style="display:none">
+                        <p class="lead"> Thank you!</p>
+                        <img src="/img/cyborg.png" height="85" width="85">
+                    </div>
+
+                    <form id="ratingFrom">
+                        <p style="margin-bottom: 0">How much do yo like your quote? Rate it!</p>
+                        <input class="star star-5" id="star-5" type="radio" name="star"/>
+                        <label class="star star-5" for="star-5"></label>
+                        <input class="star star-4" id="star-4" type="radio" name="star"/>
+                        <label class="star star-4" for="star-4"></label>
+                        <input class="star star-3" id="star-3" type="radio" name="star"/>
+                        <label class="star star-3" for="star-3"></label>
+                        <input class="star star-2" id="star-2" type="radio" name="star"/>
+                        <label class="star star-2" for="star-2"></label>
+                        <input class="star star-1" id="star-1" type="radio" name="star"/>
+                        <label class="star star-1" for="star-1"></label>
+                    </form>
+                </div>
+
+            </div>
+r
+            <div class="mastfoot">
+                <div class="inner">
+                    <p>Quote generator api, by <a href="https://twitter.com/mhmmtucan">@mhmmtucan</a>.</p>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+</body>
+
+<script>
+    $(function () {
+        $('.star').click(function (input) {
+            if ($(this).is(':checked')) {
+                var star = input.target.id;
+                var quote_id = $('#quote-id').html();
+                var keyword = '{{ keyword_value }}';
+                console.log(keyword);
+                $.post('/giveRating', {rating: star, quote_id: quote_id, keyword: keyword}, function (result) {
+                    setTimeout(function () {
+                        $('#thankYou').fadeIn(4000);
+                    }, 1500);
+                    $('#ratingFrom').fadeOut(1500);
+                })
+            }
+        });
+    });
+</script>
 </html>

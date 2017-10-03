@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="Quote Generator API and demo site">
+    <meta name="author" content="Muhammet Uçan">
+    <link rel="icon" href="https://v4-alpha.getbootstrap.com/favicon.ico">
+
+    <title>About</title>
+
+    <!-- Bootstrap core CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='/css/bootstrap.min.css') }}"/>
+
+    <!-- Custom styles for this template -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='/cover.css') }}"/>
+</head>
+
+<body>
+
+<div class="site-wrapper">
+
+    <div class="site-wrapper-inner">
+
+        <div class="cover-container">
+
+            <div class="masthead clearfix">
+                <div class="inner">
+                    <a class="lead masthead-brand" style="text-decoration: none; font-size: x-large"  href="{{ url_for('keyword') }}/">Quote Generator</a>
+                    <nav class="nav nav-masthead">
+                        <!-- http://itucsdb1741.mybluemix.net/ -->
+                        <a class="nav-link" href="{{ url_for('keyword') }}/random">Random</a>
+                        <a class="nav-link active" href="{{ url_for('keyword') }}/about">About</a>
+                        <a class="nav-link" href="{{ url_for('keyword') }}/authentication">Auth</a>
+                    </nav>
+                </div>
+            </div>
+
+            <div class="inner cover">
+                <p class="lead"> This site is about generating quotes. And if you create an authentitaction
+                    you can also use this API on your site. API provides both random and custom generation of quotes. If
+                    you make
+                    request with keyword it will produce (if keyword exist in database) a quote for you with given
+                    keyword.
+                </p>
+
+            </div>
+
+            <div class="mastfoot">
+                <div class="inner">
+                    <p>Quote generator api, by <a href="https://twitter.com/mhmmtucan">@mhmmtucan</a>.</p>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+</body>
+</html>
