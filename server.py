@@ -7,7 +7,7 @@ import psycopg2, os, binascii, re, json
 app = Flask(__name__, static_url_path="", static_folder="static")
 app.secret_key = binascii.hexlify(os.urandom(12)).decode('utf-8')
 auth = HTTPBasicAuth()
-
+global curr
 
 @auth.get_password
 def get_password(username):
