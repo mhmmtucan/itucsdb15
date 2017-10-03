@@ -7,7 +7,7 @@ import psycopg2, os, binascii, re, json
 app = Flask(__name__, static_url_path="", static_folder="static")
 app.secret_key = binascii.hexlify(os.urandom(12)).decode('utf-8')
 auth = HTTPBasicAuth()
-global curr
+
 
 @auth.get_password
 def get_password(username):
@@ -286,10 +286,10 @@ if __name__ == '__main__':
         app.config['dsn'] = """user='vagrant' password='vagrant'
                                    host='localhost' port=5432 dbname='itucsdb'"""
 
-    app.run(host='0.0.0.0', port=port, debug=debug)
-
     conn = psycopg2.connect(app.config['dsn'])
     global curr
     curr = conn.cursor()
+    app.run(host='0.0.0.0', port=port, debug=debug)
+
     conn.commit()
     conn.close()
