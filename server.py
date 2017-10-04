@@ -79,6 +79,7 @@ def get_quote_with_keyword(keyword):
         index = randint(1, 9)
         SQL = "SELECT * FROM notfound WHERE id={}".format(index)
         curr.execute(SQL)
+        session['404'] = True
         return ('0', curr.fetchone()[1], '404', '0', '0')
 
 
@@ -145,7 +146,9 @@ def keyword():
         keyword = curr.fetchone()[0]
 
     data = get_quote_with_keyword(keyword)
-    return render_template('home.html', writer=data[2], quote=data[1], keyword_value=keyword, quote_id=data[0])
+    if session['404']: isHidden = 'hidden'
+    else : isHidden =''
+    return render_template('home.html', writer=data[2], quote=data[1], keyword_value=keyword, quote_id=data[0], isHidden=isHidden)
 
 
 @app.route('/random')
@@ -284,7 +287,7 @@ if __name__ == '__main__':
         app.config['dsn'] = get_elephantsql_dsn(VCAP_SERVICES)
     else:
         app.config['dsn'] = """user='vagrant' password='vagrant'
-                                   host='localhost' port=5432 dbname='itucsdb'"""
+                                       host='localhost' port=5432 dbname='itucsdb'"""
 
     conn = psycopg2.connect(app.config['dsn'])
     global curr

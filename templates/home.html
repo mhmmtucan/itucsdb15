@@ -55,12 +55,12 @@
                         </small>
 
                     </div>
-                    <button type="submit" class="btn btn-secondary" name="btn" value="Generate">Generate</button>
+                    <button type="submit" id="generate-btn" class="btn btn-secondary" name="btn" value="Generate">Generate</button>
                 </form>
                 <br>
                 <br>
 
-                <div class="stars">
+                <div class="stars" {{ isHidden }}>
                     <div id="thankYou" style="display:none">
                         <p class="lead"> Thank you!</p>
                         <img src="/img/cyborg.png" height="85" width="85">
@@ -104,7 +104,6 @@
                 var star = input.target.id;
                 var quote_id = $('#quote-id').html();
                 var keyword = '{{ keyword_value }}';
-                console.log(keyword);
                 $.post('/giveRating', {rating: star, quote_id: quote_id, keyword: keyword}, function (result) {
                     setTimeout(function () {
                         $('#thankYou').fadeIn(4000);
