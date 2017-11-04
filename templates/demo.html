@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="Quote Generator API and demo site">
+    <meta name="author" content="Muhammet Uçan">
+    <link rel="icon" href="https://v4-alpha.getbootstrap.com/favicon.ico">
+
+    <title>Quote Generator</title>
+
+    <!-- Bootstrap core CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='/css/bootstrap.min.css') }}"/>
+
+    <!-- Custom styles for this template -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='/cover.css') }}"/>
+</head>
+
+<body>
+
+<div class="site-wrapper">
+
+    <div class="site-wrapper-inner">
+
+        <div class="cover-container">
+
+            <div class="masthead clearfix">
+                <div class="inner">
+                    <a class="lead masthead-brand" style="text-decoration: none; font-size: x-large"
+                       href="http://itucsdb1741.mybluemix.net/">Quote Generator</a>
+                    <nav class="nav nav-masthead">
+                        <!-- http://itucsdb1741.mybluemix.net/ -->
+                        <a class="nav-link" href="http://itucsdb1741.mybluemix.net/random">Random</a>
+                        <a class="nav-link" href="http://itucsdb1741.mybluemix.net/about">About</a>
+                        <a class="nav-link" href="http://itucsdb1741.mybluemix.net/authentication">Auth</a>
+                    </nav>
+                </div>
+            </div>
+
+            <div class="inner cover">
+                <button type="submit" class="btn btn-primary" name="btn" value="Create">Create</button>
+                <button type="submit" class="btn btn-primary" name="btn" value="Insert">Insert</button>
+                <button type="submit" class="btn btn-primary" name="btn" value="Update">Update</button>
+                <button type="submit" class="btn btn-primary" name="btn" value="Select">Select</button>
+                <button type="submit" class="btn btn-primary" name="btn" value="Delete">Delete</button>
+            </div>
+
+            <div class="mastfoot">
+                <div class="inner">
+                    <p>Quote generator api, by <a href="https://twitter.com/mhmmtucan">@mhmmtucan</a>.</p>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+</body>
+</html>
