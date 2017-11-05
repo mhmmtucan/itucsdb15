@@ -1,8 +1,13 @@
 #!flask/bin/python
+from random import randint
+
+import binascii
+import json
+import os
+import psycopg2
+import re
 from flask import Flask, jsonify, abort, request, make_response, url_for, render_template, redirect, session
 from flask_httpauth import HTTPBasicAuth
-from random import randint
-import psycopg2, os, binascii, re, json
 
 app = Flask(__name__, static_url_path="", static_folder="static")
 app.secret_key = binascii.hexlify(os.urandom(12)).decode('utf-8')
@@ -32,12 +37,12 @@ def unauthorized():
 
 
 @app.errorhandler(400)
-def not_found(error):
+def not_found():
     return make_response(jsonify({'error': 'Bad request'}), 404)
 
 
 @app.errorhandler(404)
-def not_found(error):
+def not_found():
     return make_response(jsonify({'error': 'Not found'}), 404)
 
 
@@ -45,16 +50,14 @@ def not_found(error):
 def get_quote_random():
     curr.execute('SELECT count(*) AS exact_count FROM categories')
     size = curr.fetchone()[0]
-    index = randint(1, size)
-    SQL = "SELECT keyword FROM categories WHERE  id={}".format(index)
+    SQL = "SELECT keyword FROM categories OFFSET floor(random()*{})".format(size)
     curr.execute(SQL)
     keyword = curr.fetchone()[0]
 
     SQL = "SELECT count(*) AS exact_count FROM {}".format(keyword)
     curr.execute(SQL)
     size = curr.fetchone()[0]
-    index = randint(1, size)
-    SQL = "SELECT * FROM {} WHERE  id={}".format(keyword, index)
+    SQL = "SELECT * FROM {} OFFSET floor(random()*{})".format(keyword, size)
     curr.execute(SQL)
     quote = curr.fetchone()
     return quote
@@ -70,8 +73,7 @@ def get_quote_with_keyword(keyword):
         curr.execute(SQL)
         size = curr.fetchone()[0]
         # keyword exist in database
-        index = randint(1, size)
-        SQL = "SELECT * FROM {} WHERE id={}".format(keyword, index)
+        SQL = "SELECT * FROM {} OFFSET floor(random()*{})".format(keyword, size)
         curr.execute(SQL)
         quote = curr.fetchone()
         return quote
@@ -140,8 +142,7 @@ def keyword():
     elif request.method == 'GET':
         curr.execute('SELECT count(*) AS exact_count FROM categories')
         size = curr.fetchone()[0]
-        index = randint(1, size)
-        SQL = "SELECT keyword FROM categories WHERE  id={}".format(index)
+        SQL = "SELECT keyword FROM categories OFFSET floor(random()*{})".format(size)
         curr.execute(SQL)
         keyword = curr.fetchone()[0]
 
@@ -274,48 +275,55 @@ def demo():
     if request.method == 'POST':
         data = ''
         if request.form['btn'] == 'Create':
-            print("here")
-            SQL = ("INSERT INTO categories(keyword) VALUES ('science') ON CONFLICT DO NOTHING ")
+            SQL = "INSERT INTO categories(keyword) VALUES ('science') ON CONFLICT DO NOTHING "
             curr.execute(SQL)
             conn.commit()
-            SQL2 = ("CREATE TABLE IF NOT EXISTS science("
-                    "id SERIAL PRIMARY KEY,"
-                    "quote VARCHAR(255) DEFAULT NULL ,"
-                    "writer VARCHAR(20) DEFAULT NULL ,"
-                    "votes INTEGER DEFAULT 0,"
-                    "rate DOUBLE PRECISION DEFAULT 0)")
-            curr.execute(SQL2)
+            SQL = ("CREATE TABLE IF NOT EXISTS science("
+                   "id SERIAL PRIMARY KEY,"
+                   "quote VARCHAR(255) DEFAULT NULL ,"
+                   "writer VARCHAR(20) DEFAULT NULL ,"
+                   "votes INTEGER DEFAULT 0,"
+                   "rate DOUBLE PRECISION DEFAULT 0)")
+            curr.execute(SQL)
             conn.commit()
-
+            data = "Table created."
         elif request.form['btn'] == 'Insert':
             SQL = (
-            "INSERT INTO science(quote, writer) VALUES ('Two things are infinite: the universe and human stupidity; and I''m not sure about the universe.','Albert Einstein');"
-            "INSERT INTO science(quote, writer) VALUES ('The saddest aspect of life right now is that science gathers knowledge faster than society gathers wisdom.','Isaac Asimov');"
-            "INSERT INTO science(quote, writer) VALUES ('Never memorize something that you can look up.','Albert Einstein');"
-            "INSERT INTO science(quote, writer) VALUES ('We are stuck with technology when what we really want is just stuff that works.','Douglas Adams');"
-            "INSERT INTO science(quote, writer) VALUES ('The scientist is not a person who gives the right answers, he''s one who asks the right questions.','Claude Lévi-Strauss');"
-            "INSERT INTO science(quote, writer) VALUES ('I learned very early the difference between knowing the name of something and knowing something.','Richard Feynman');"
-            "INSERT INTO science(quote, writer) VALUES ('Millions saw the apple fall, Newton was the only one who asked why?','Bernard Baruch');"
-            "INSERT INTO science(quote, writer) VALUES ('The most beautiful experience we can have is the mysterious. It is the fundamental emotion that stands at the cradle of true art and true science','Albert Einstein');")
+                "INSERT INTO science(quote, writer) VALUES ('Two things are infinite: the universe and human stupidity; and I''m not sure about the universe.','Albert Einstein');"
+                "INSERT INTO science(quote, writer) VALUES ('The saddest aspect of life right now is that science gathers knowledge faster than society gathers wisdom.','Isaac Asimov');"
+                "INSERT INTO science(quote, writer) VALUES ('Never memorize something that you can look up.','Albert Einstein');"
+                "INSERT INTO science(quote, writer) VALUES ('We are stuck with technology when what we really want is just stuff that works.','Douglas Adams');"
+                "INSERT INTO science(quote, writer) VALUES ('The scientist is not a person who gives the right answers, he''s one who asks the right questions.','Claude Lévi-Strauss');"
+                "INSERT INTO science(quote, writer) VALUES ('I learned very early the difference between knowing the name of something and knowing something.','Richard Feynman');"
+                "INSERT INTO science(quote, writer) VALUES ('Millions saw the apple fall, Newton was the only one who asked why?','Bernard Baruch');"
+                "INSERT INTO science(quote, writer) VALUES ('The most beautiful experience we can have is the mysterious. It is the fundamental emotion that stands at the cradle of true art and true science','Albert Einstein');")
             curr.execute(SQL)
             conn.commit()
+            data = "Rows inserted."
         elif request.form['btn'] == 'Update':
+            SQL = "SELECT * FROM science"
+            curr.execute(SQL)
+            index = curr.fetchone()[0]
             SQL = (
-            "UPDATE science SET quote = 'An expert is a person who has made all the mistakes that can be made in a very narrow field.', writer = 'Niels Bohr' WHERE id = 1;")
+                "UPDATE science SET quote = 'An expert is a person who has made all the mistakes that can be made in a very narrow field.', writer = 'Niels Bohr' WHERE id = {}").format(
+                index)
             curr.execute(SQL)
             conn.commit()
+            data = "Update successful."
         elif request.form['btn'] == 'Select':
-            SQL = ("SELECT * FROM science")
+            SQL = "SELECT * FROM science"
             curr.execute(SQL)
             data = curr.fetchone()
-            print(data)
-            print(type(data))
         elif request.form['btn'] == 'Delete':
             SQL = ("DELETE FROM categories WHERE keyword='science';"
-             "DROP TABLE science;")
+                   "DROP TABLE science;")
             curr.execute(SQL)
             conn.commit()
-        return render_template("demo.html",result=data[1])
+            data = "Table deleted."
+        if request.form['btn'] == 'Select':
+            return render_template("demo.html", result=data[1])
+        else:
+            return render_template("demo.html", result=data)
     elif request.method == 'GET':
         return render_template("demo.html", result='')
 
@@ -342,8 +350,8 @@ if __name__ == '__main__':
     if VCAP_SERVICES is not None:
         app.config['dsn'] = get_elephantsql_dsn(VCAP_SERVICES)
     else:
-        app.config['dsn'] = """user='jbrfcxmo' password='AoxLsP3utE9N4eSkzj-tLLPbb1If_nqs'
-                                       host='hanno.db.elephantsql.com' port=5432 dbname='jbrfcxmo'"""
+        app.config['dsn'] = """user='user' password='password'
+                                       host='host' port=5432 dbname='dbname'"""
 
     conn = psycopg2.connect(app.config['dsn'])
     global curr
