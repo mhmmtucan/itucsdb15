@@ -29,24 +29,26 @@
             <div class="masthead clearfix">
                 <div class="inner">
                     <a class="lead masthead-brand" style="text-decoration: none; font-size: x-large"
-                       href="http://itucsdb1741.mybluemix.net/">Quote Generator</a>
+                       href="/">Quote Generator</a>
                     <nav class="nav nav-masthead">
                         <!-- http://itucsdb1741.mybluemix.net/ -->
-                        <a class="nav-link" href="http://itucsdb1741.mybluemix.net/random">Random</a>
-                        <a class="nav-link" href="http://itucsdb1741.mybluemix.net/about">About</a>
-                        <a class="nav-link" href="http://itucsdb1741.mybluemix.net/authentication">Auth</a>
+                        <a class="nav-link" href="/random">Random</a>
+                        <a class="nav-link" href="/about">About</a>
+                        <a class="nav-link" href="/authentication">Auth</a>
                     </nav>
                 </div>
             </div>
 
             <div class="inner cover">
+                <form action=" {{ url_for('demo') }} " method="post">
                 <button type="submit" class="btn btn-primary" name="btn" value="Create">Create</button>
                 <button type="submit" class="btn btn-primary" name="btn" value="Insert">Insert</button>
                 <button type="submit" class="btn btn-primary" name="btn" value="Update">Update</button>
                 <button type="submit" class="btn btn-primary" name="btn" value="Select">Select</button>
                 <button type="submit" class="btn btn-primary" name="btn" value="Delete">Delete</button>
+                </form>
             </div>
-
+            <p style="margin-top: 20px;">{{ result }}</p>
             <div class="mastfoot">
                 <div class="inner">
                     <p>Quote generator api, by <a href="https://twitter.com/mhmmtucan">@mhmmtucan</a>.</p>

@@ -146,10 +146,12 @@ def keyword():
         keyword = curr.fetchone()[0]
 
     data = get_quote_with_keyword(keyword)
-    if session['404']:
-        isHidden = 'hidden'
-    else:
-        isHidden = ''
+    isHidden = ''
+    if session.get('404'):
+        if session['404']:
+            isHidden = 'hidden'
+        else:
+            isHidden = ''
     return render_template('home.html', writer=data[2], quote=data[1], keyword_value=keyword, quote_id=data[0],
                            isHidden=isHidden)
 
@@ -267,48 +269,55 @@ def giveRating():
     })
 
 
-@app.route('/demo')
+@app.route('/demo', methods=['GET', 'POST'])
 def demo():
-    # TODO: sql create update and delete
-    if request.form['btn'] == 'Login':
-        SQL = ("INSERT INTO categories(keyword) VALUES ('science')")
-        curr.execute(SQL)
-        conn.commit()
-        SQL2 = ("CREATE TABLE science("
-                "id SERIAL PRIMARY KEY,"
-                "quote VARCHAR(255) DEFAULT NULL ,"
-                "writer VARCHAR(20) DEFAULT NULL ,"
-                "votes INTEGER DEFAULT 0,"
-                "rate DOUBLE PRECISION DEFAULT 0)")
-        curr.execute(SQL2)
-        conn.commit()
+    if request.method == 'POST':
+        data = ''
+        if request.form['btn'] == 'Create':
+            print("here")
+            SQL = ("INSERT INTO categories(keyword) VALUES ('science') ON CONFLICT DO NOTHING ")
+            curr.execute(SQL)
+            conn.commit()
+            SQL2 = ("CREATE TABLE IF NOT EXISTS science("
+                    "id SERIAL PRIMARY KEY,"
+                    "quote VARCHAR(255) DEFAULT NULL ,"
+                    "writer VARCHAR(20) DEFAULT NULL ,"
+                    "votes INTEGER DEFAULT 0,"
+                    "rate DOUBLE PRECISION DEFAULT 0)")
+            curr.execute(SQL2)
+            conn.commit()
 
-    elif request.form['btn'] == 'Insert':
-        SQL = (
-        "INSERT INTO science(quote, writer) VALUES ('Two things are infinite: the universe and human stupidity; and I''m not sure about the universe.','Albert Einstein');"
-        "INSERT INTO science(quote, writer) VALUES ('The saddest aspect of life right now is that science gathers knowledge faster than society gathers wisdom.','Isaac Asimov');"
-        "INSERT INTO science(quote, writer) VALUES ('Never memorize something that you can look up.','Albert Einstein');"
-        "INSERT INTO science(quote, writer) VALUES ('We are stuck with technology when what we really want is just stuff that works.','Douglas Adams');"
-        "INSERT INTO science(quote, writer) VALUES ('The scientist is not a person who gives the right answers, he''s one who asks the right questions.','Claude Lévi-Strauss');"
-        "INSERT INTO science(quote, writer) VALUES ('I learned very early the difference between knowing the name of something and knowing something.','Richard Feynman');"
-        "INSERT INTO science(quote, writer) VALUES ('Millions saw the apple fall, Newton was the only one who asked why?','Millions saw the apple fall, Newton was the only one who asked why?');"
-        "INSERT INTO science(quote, writer) VALUES ('The most beautiful experience we can have is the mysterious. It is the fundamental emotion that stands at the cradle of true art and true science','Albert Einstein');")
-        curr.execute(SQL)
-        conn.commit()
-    elif request.form['btn'] == 'Update':
-        SQL = (
-        "UPDATE science SET quote = 'An expert is a person who has made all the mistakes that can be made in a very narrow field.', writer = 'Niels Bohr' WHERE id = 1;")
-        curr.execute(SQL)
-        conn.commit()
-    elif request.form['btn'] == 'Select':
-        SQL = ("SELECT * FROM science")
-        curr.execute(SQL)
-    elif request.form['btn'] == 'Delete':
-        SQL = ("DELETE FROM categories WHERE keyword='science';"
-         "DROP TABLE science;")
-        curr.execute(SQL)
-        conn.commit()
-    return render_template("demo.html")
+        elif request.form['btn'] == 'Insert':
+            SQL = (
+            "INSERT INTO science(quote, writer) VALUES ('Two things are infinite: the universe and human stupidity; and I''m not sure about the universe.','Albert Einstein');"
+            "INSERT INTO science(quote, writer) VALUES ('The saddest aspect of life right now is that science gathers knowledge faster than society gathers wisdom.','Isaac Asimov');"
+            "INSERT INTO science(quote, writer) VALUES ('Never memorize something that you can look up.','Albert Einstein');"
+            "INSERT INTO science(quote, writer) VALUES ('We are stuck with technology when what we really want is just stuff that works.','Douglas Adams');"
+            "INSERT INTO science(quote, writer) VALUES ('The scientist is not a person who gives the right answers, he''s one who asks the right questions.','Claude Lévi-Strauss');"
+            "INSERT INTO science(quote, writer) VALUES ('I learned very early the difference between knowing the name of something and knowing something.','Richard Feynman');"
+            "INSERT INTO science(quote, writer) VALUES ('Millions saw the apple fall, Newton was the only one who asked why?','Bernard Baruch');"
+            "INSERT INTO science(quote, writer) VALUES ('The most beautiful experience we can have is the mysterious. It is the fundamental emotion that stands at the cradle of true art and true science','Albert Einstein');")
+            curr.execute(SQL)
+            conn.commit()
+        elif request.form['btn'] == 'Update':
+            SQL = (
+            "UPDATE science SET quote = 'An expert is a person who has made all the mistakes that can be made in a very narrow field.', writer = 'Niels Bohr' WHERE id = 1;")
+            curr.execute(SQL)
+            conn.commit()
+        elif request.form['btn'] == 'Select':
+            SQL = ("SELECT * FROM science")
+            curr.execute(SQL)
+            data = curr.fetchone()
+            print(data)
+            print(type(data))
+        elif request.form['btn'] == 'Delete':
+            SQL = ("DELETE FROM categories WHERE keyword='science';"
+             "DROP TABLE science;")
+            curr.execute(SQL)
+            conn.commit()
+        return render_template("demo.html",result=data[1])
+    elif request.method == 'GET':
+        return render_template("demo.html", result='')
 
 
 def get_elephantsql_dsn(vcap_services):
@@ -333,12 +342,13 @@ if __name__ == '__main__':
     if VCAP_SERVICES is not None:
         app.config['dsn'] = get_elephantsql_dsn(VCAP_SERVICES)
     else:
-        app.config['dsn'] = """user='vagrant' password='vagrant'
-                                       host='localhost' port=5432 dbname='itucsdb'"""
+        app.config['dsn'] = """user='jbrfcxmo' password='AoxLsP3utE9N4eSkzj-tLLPbb1If_nqs'
+                                       host='hanno.db.elephantsql.com' port=5432 dbname='jbrfcxmo'"""
 
     conn = psycopg2.connect(app.config['dsn'])
     global curr
     curr = conn.cursor()
+
     app.run(host='0.0.0.0', port=port, debug=debug)
 
     conn.commit()
