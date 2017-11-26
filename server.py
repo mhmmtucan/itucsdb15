@@ -353,7 +353,6 @@ if __name__ == '__main__':
         uri = os.getenv('TRAVIS_ENV')
         match = re.match('postgres://(.*?):(.*?)@(.*?)(:(\d+))?/(.*)', uri)
         user, password, host, _, port, dbname = match.groups()
-        port=34000
         dsn = """user='{}' password='{}' host='{}' port={}
              dbname='{}'""".format(user, password, host, port, dbname)
         app.config['dsn'] = dsn
