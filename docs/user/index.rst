@@ -22,7 +22,8 @@ related with the generated quote or they can give rating becuase they
 like the quote. These rating data will be used later in order to
 determine whether generated quote is good or not.
 
-### Randomly Choosen Quote
+Randomly Choosen Quote
+~~~~~~~~~~~~~~~~~~
 
 If users don't have any particular keyword, still they can generate
 quotes. This functionality can be reached from the menu.
