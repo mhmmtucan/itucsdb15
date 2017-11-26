@@ -350,8 +350,12 @@ if __name__ == '__main__':
     if VCAP_SERVICES is not None:
         app.config['dsn'] = get_elephantsql_dsn(VCAP_SERVICES)
     else:
-        app.config['dsn'] = """user='user' password='password'
-                                       host='host' port=5432 dbname='dbname'"""
+        uri = os.getenv('TRAVIS_ENV')
+        match = re.match('postgres://(.*?):(.*?)@(.*?)(:(\d+))?/(.*)', uri)
+        user, password, host, _, port, dbname = match.groups()
+        dsn = """user='{}' password='{}' host='{}' port={}
+             dbname='{}'""".format(user, password, host, port, dbname)
+        app.config['dsn'] = dsn
 
     conn = psycopg2.connect(app.config['dsn'])
     global curr

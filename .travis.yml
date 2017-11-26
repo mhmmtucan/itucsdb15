@@ -1,9 +1,9 @@
 language: python
 python:
-  - "3.6.2"
-# command to install dependencies
+- 3.6.2
 install:
-  - pip install -r requirements.txt
-# command to run tests
+- pip install -r requirements.txt
 script:
-  - python server.py
+- python server.py
+env:
+  secure: Qij2q5wHaIWUZ1s1JYku4J57hHrzSFzH003Uw1qILC/F5cWar0TgIafhGsx7IjsgOelNYeA1E+UXaAcFHh01AGqPV2tmR3JFokFWYKC6x4HtFQUNhU+u+6D0YgaJvmBfRb28B4TBJFP7GJMsNORq3DiVwxL+ClrOzjYUa13086kauY6dURaUFRkdvhx7jeym6MRk9vXYq5nQ11U95ztsiwtopaK9u9++Vm+EelaC6wbH2mqj10Wnjz72yqnYN2EMv4ezD84CIV/HR6lpma+QUNrJAIAVFeZmJwzjQvMHdsOuHKxlT9DQFXavLtKuGTYgoYgOKuN3/CTqwEhklRz2F6DeNCZ5SBVSX2Ke7yrDxCEiG3Pfynj1kQO5QpzT5JRl08Wz1sk7bNk2jhKPR/tPxa1HgwrKy4Zw31OH5xO4nSb92/Q4oyueTKkSBqa4NkZPrXpaRwjqlEVVMjnHaNoz4RcQMsU2q+q30UYEhlQgngF6HuAhac/1DXw0bD9BKs185eTRgFpJcKl0hf8uuEV06Ixziz3kAzQufrk/7V6Lp6LNwOycHZeGi0qq1gH7lls3xT38eVGXWCVVn2kdn2F7J9hThU/T6JDpdGRWfOkbPSudbGin2dIRi1bRdkvjBz3pfCxmtD6q6QsX2FBAKpHGPXLSh1Xk6i8gEZVDzhTIqlU=
