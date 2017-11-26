@@ -1,17 +1,76 @@
-This README.md file is displayed on your project page. You should edit this 
-file to describe your project, including instructions for building and 
-running the project, pointers to the license under which you are making the 
-project available, and anything else you think would be useful for others to
-know.
+[![GitHub license](https://img.shields.io/github/license/mhmmtucan/itucsdb1741.svg)](https://github.com/mhmmtucan/itucsdb1741/blob/master/LICENSE)
 
-We have created an empty license.txt file for you. Well, actually, it says,
-"<Replace this text with the license you've chosen for your project.>" We 
-recommend you edit this and include text for license terms under which you're
-making your code available. A good resource for open source licenses is the 
-[Open Source Initiative](http://opensource.org/).
+Generating quotes using keywords or randomly choosed.
 
-Be sure to update your project's profile with a short description and 
-eye-catching graphic.
+This repo provides an API service for generating quotes with given keywords. If user dont want to give an keywords, then API provide him and randomly choosen quote. The number of qoutes are restricted by the quotes in database.
 
-Finally, consider defining some sprints and work items in Track & Plan to give 
-interested developers a sense of your cadence and upcoming enhancements.
+### Getting Started
+
+Follow instuction below in order to setup applicaton.
+
+* Download or clone repository.
+* Start server, using `server.py` file. In order to start server use: `python3 server.py`
+
+NOTE: In order to properly run the project database connection should be made.
+
+### Usage
+
+The demo of API service can be found [here](http://itucsdb1741.mybluemix.net/). 
+
+[![itucsdb1741.png](https://s20.postimg.org/b5nya78od/itucsdb1741.png)](https://postimg.org/image/siy8p23zd/)
+
+User can enter keyword in the search box and generate quotes.
+
+### API Usage
+
+Before making a request user has to create credentials. In order to that, **Auth** menu link should be used. After creating and user account `API KEY` will be given to user.
+
+_**Base Link**_
+
+`http://itucsdb1741.mybluemix.net/quote/api/v1.0/`
+
+_**Authentication**_
+
+Add following key-pairs to the Header. Basic Auth requires user to send Username and Password.
+
+`ApiKey = API_KEY_HERE`
+`For Authorization use Basic Auth`
+
+_**GET /quote/api/v1.0/random**_
+
+Below request will return randomly generated quote.
+
+`GET /quote/api/v1.0/random HTTP/1.1
+Host: itucsdb1741.mybluemix.net
+ApiKey: API_KEY
+Authorization: Basic user-password`
+
+_**GET /quote/api/v1.0/{?keyword}**_
+
+In order to get quote with keyword, it should be added at the and of URL. In the example below quote with `funny` will be returned.
+
+`GET /quote/api/v1.0/funny?ApiKey=API_KEY_HERE HTTP/1.1
+Authorization: Basic user-password
+ApiKey: API_KEY_HERE`
+
+_**Error Codes and Meanings**_
+
+| Code | Text | Description |
+| --- | --- | --- | --- |
+| 400 | ApiKey Missing or Wrong | Api Key is wrong |
+| 400 | Add ApiKey to header | Api Key should be added to Header |
+| 403 | Unauthorized access | Basic Auth is missing in Header |
+
+
+### Builth With
+* Python
+* Flask
+* Postgres
+* Blumix-Cloud
+
+### Licence
+* GNU General Public License v3.0
+
+### Version
+* 1.0
+
