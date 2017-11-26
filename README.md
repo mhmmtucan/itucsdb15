@@ -33,31 +33,31 @@ _**Authentication**_
 
 Add following key-pairs to the Header. Basic Auth requires user to send Username and Password.
 
-`ApiKey = API_KEY_HERE`
-
-`For Authorization use Basic Auth`
+```
+ApiKey = API_KEY_HERE 
+For Authorization use Basic Auth
+```
 
 _**GET /quote/api/v1.0/random**_
 
 Below request will return randomly generated quote.
 
-`GET /quote/api/v1.0/random HTTP/1.1`
-
-`Host: itucsdb1741.mybluemix.net`
-
-`ApiKey: API_KEY`
-
-`Authorization: Basic user-password`
+```
+GET /quote/api/v1.0/random HTTP/1.1
+Host: itucsdb1741.mybluemix.net
+ApiKey: API_KEY
+Authorization: Basic user-password
+```
 
 _**GET /quote/api/v1.0/{?keyword}**_
 
 In order to get quote with keyword, it should be added at the and of URL. In the example below quote with `funny` will be returned.
 
-`GET /quote/api/v1.0/funny?ApiKey=API_KEY_HERE HTTP/1.1`
-
-`Authorization: Basic user-password`
-
-`ApiKey: API_KEY_HERE`
+```
+GET /quote/api/v1.0/funny?ApiKey=API_KEY_HERE HTTP/1.1
+Authorization: Basic user-password
+ApiKey: API_KEY_HERE
+```
 
 _**Error Codes and Meanings**_
 
