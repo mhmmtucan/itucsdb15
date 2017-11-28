@@ -1,4 +1,4 @@
-[![GitHub code size in bytes](https://img.shields.io/github/languages/code-size/badges/shields.svg)](https://github.com/mhmmtucan/itucsdb1741) [![GitHub top language](https://img.shields.io/github/languages/top/badges/shields.svg)](https://github.com/mhmmtucan/itucsdb1741) [![GitHub license](https://img.shields.io/github/license/mhmmtucan/itucsdb1741.svg)](https://github.com/mhmmtucan/itucsdb1741/blob/master/LICENSE)
+[![GitHub license](https://img.shields.io/github/license/mhmmtucan/itucsdb1741.svg)](https://github.com/mhmmtucan/itucsdb1741/blob/master/LICENSE)
 
 Generating quotes using keywords or randomly choosed.
 
