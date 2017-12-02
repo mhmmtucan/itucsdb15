@@ -1,0 +1,53 @@
+CREATE TABLE public.categories
+(
+    id SERIAL PRIMARY KEY,
+    keyword VARCHAR(20)
+);
+
+CREATE TABLE public.quotes
+(
+    id SERIAL PRIMARY KEY,
+    quote VARCHAR(255) NOT NULL,
+    votes INT DEFAULT 0,
+    rate DOUBLE PRECISION DEFAULT 0,
+    category_id INT NOT NULL,
+    writer_id INT NOT NULL,
+    CONSTRAINT quotes_categories_id_fk FOREIGN KEY (category_id) REFERENCES categories (id)
+);
+
+CREATE TABLE public.writers
+(
+    id SERIAL PRIMARY KEY,
+    writer VARCHAR(20) NOT NULL
+);
+CREATE UNIQUE INDEX writers_writer_uindex ON public.writers (writer);
+
+CREATE TABLE public.users
+(
+    id SERIAL PRIMARY KEY,
+    username VARCHAR(15) NOT NULL,
+    password VARCHAR(15) NOT NULL,
+    api_key VARCHAR(24) NOT NULL
+);
+CREATE UNIQUE INDEX users_username_uindex ON public.users (username);
+CREATE UNIQUE INDEX users_api_key_uindex ON public.users (api_key);
+
+CREATE TABLE public.comments
+(
+    id SERIAL PRIMARY KEY,
+    user_id INT NOT NULL,
+    quote_id INT NOT NULL,
+    comment VARCHAR(280) NOT NULL,
+    CONSTRAINT comments_users_id_fk FOREIGN KEY (user_id) REFERENCES users (id),
+    CONSTRAINT comments_quotes_id_fk FOREIGN KEY (quote_id) REFERENCES quotes (id)
+);
+
+CREATE TABLE public.user_quotes
+(
+    id SERIAL PRIMARY KEY,
+    user_id INT NOT NULL,
+    quote VARCHAR(200) NOT NULL,
+    writer VARCHAR(20) NOT NULL,
+    category_id INT NOT NULL,
+    CONSTRAINT user_quotes_categories_id_fk FOREIGN KEY (category_id) REFERENCES categories (id)
+);

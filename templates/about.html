@@ -7,7 +7,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <meta name="description" content="Quote Generator API and demo site">
     <meta name="author" content="Muhammet Uçan">
-    <link rel="icon" href="https://v4-alpha.getbootstrap.com/favicon.ico">
+    <link rel="icon" type="image/ico" href="/img/favicon.ico">
 
     <title>About</title>
 
@@ -33,6 +33,7 @@
                     <nav class="nav nav-masthead">
                         <!-- http://itucsdb1741.mybluemix.net/ -->
                         <a class="nav-link" href="/random">Random</a>
+                        <a class="nav-link" href="/addNew">Add</a>
                         <a class="nav-link active" href="/about">About</a>
                         <a class="nav-link" href="/authentication">Auth</a>
                     </nav>
@@ -40,13 +41,21 @@
             </div>
 
             <div class="inner cover">
-                <p class="lead"> This site is about generating quotes. And if you create an authentitaction
-                    you can also use this API on your site. API provides both random and custom generation of quotes. If
-                    you make
-                    request with keyword it will produce (if keyword exist in database) a quote for you with given
-                    keyword.
+                <p>This site provides an API service for generating quotes with given keywords. If user dont want to give an keywords,
+                    then API provide him and randomly choosen quote. The number of qoutes are restricted by the quotes in database.
                 </p>
+                <p>    Before making a request user has to create credentials. In order to that,
+                    Auth menu link should be used. After creating and user account API KEY will be given to user.
+               </p>
+                <p>Base Link :  <code>http://itucsdb1741.mybluemix.net/quote/api/v1.0/</code> </p>
 
+                <p>For Authentication of API use Basic Auth (username - password) and add Api-key with tag <code>ApiKey</code></p>
+
+                <p> random: <code>GET /quote/api/v1.0/random</code></p>
+
+                <p> with keyword: <code>GET /quote/api/v1.0/{?keyword}</code></p>
+
+                <p>For more detail please look up <a style="color:#bd2130;" href="https://github.com/mhmmtucan/itucsdb1741" target="_blank">github</a> repository.</p>
             </div>
 
             <div class="mastfoot">

@@ -1,0 +1,2 @@
+TRUNCATE TABLE user_quotes,comments,users,quotes,categories,writers RESTART IDENTITY;
+DROP TABLE user_quotes,comments,users,quotes,categories,writers;

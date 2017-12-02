@@ -48,16 +48,8 @@ def not_found():
 
 # take quote randomly
 def get_quote_random():
-    curr.execute('SELECT count(*) AS exact_count FROM categories')
-    size = curr.fetchone()[0]
-    SQL = "SELECT keyword FROM categories OFFSET floor(random()*{})".format(size)
-    curr.execute(SQL)
-    keyword = curr.fetchone()[0]
-
-    SQL = "SELECT count(*) AS exact_count FROM {}".format(keyword)
-    curr.execute(SQL)
-    size = curr.fetchone()[0]
-    SQL = "SELECT * FROM {} OFFSET floor(random()*{})".format(keyword, size)
+    SQL = "SELECT quote,writer FROM quotes,writers,categories WHERE (quotes.writer_id = writers.id) AND \
+            (quotes.category_id = categories.id) AND (categories.keyword NOT IN ('notfound')) ORDER BY random() LIMIT 1"
     curr.execute(SQL)
     quote = curr.fetchone()
     return quote
@@ -65,25 +57,22 @@ def get_quote_random():
 
 # take quote with keyword
 def get_quote_with_keyword(keyword):
-    SQL = "SELECT to_regclass('{}')".format(keyword)
+    SQL = "SELECT EXISTS (SELECT 1 FROM categories,quotes WHERE (quotes.category_id = categories.id) AND (keyword = '{}'))".format(keyword)
     curr.execute(SQL)
-    db_exists = curr.fetchone()[0]
-    if db_exists is not None:
-        SQL = "SELECT count(*) As exact_count FROM {}".format(keyword)
-        curr.execute(SQL)
-        size = curr.fetchone()[0]
-        # keyword exist in database
-        SQL = "SELECT * FROM {} OFFSET floor(random()*{})".format(keyword, size)
-        curr.execute(SQL)
-        quote = curr.fetchone()
-        return quote
-    else:
-        index = randint(1, 9)
-        SQL = "SELECT * FROM notfound WHERE id={}".format(index)
-        curr.execute(SQL)
-        session['404'] = True
-        return ('0', curr.fetchone()[1], '404', '0', '0')
+    category_exists = curr.fetchone()[0]
 
+    if not category_exists:
+        keyword = "notfound"
+        session['404'] = True
+    else:
+        session['404'] = False
+
+    SQL = "SELECT quotes.id,quote,writer FROM quotes,categories,writers WHERE (quotes.category_id = categories.id) AND \
+          (quotes.writer_id = writers.id) AND (keyword = '{}') ORDER BY random() LIMIT 1".format(
+        keyword)
+    curr.execute(SQL)
+    quote = curr.fetchone()
+    return quote
 
 @app.route('/quote/api/v1.0/random', methods=['GET'])
 @auth.login_required
@@ -140,27 +129,30 @@ def keyword():
     if request.method == 'POST':
         keyword = request.form.get('keyword')
     elif request.method == 'GET':
-        curr.execute('SELECT count(*) AS exact_count FROM categories')
-        size = curr.fetchone()[0]
-        SQL = "SELECT keyword FROM categories OFFSET floor(random()*{})".format(size)
+        SQL = "SELECT keyword from categories WHERE (keyword NOT IN ('notfound'))ORDER BY random() LIMIT 1"
         curr.execute(SQL)
         keyword = curr.fetchone()[0]
 
     data = get_quote_with_keyword(keyword)
-    isHidden = ''
+    is_hidden = ''
+    is_logged = ''
     if session.get('404'):
         if session['404']:
-            isHidden = 'hidden'
+            is_hidden = 'hidden'
         else:
-            isHidden = ''
+            is_hidden = ''
+    if session.get('user_logged'):
+        is_logged = ''
+    else:
+        is_logged = 'hidden'
     return render_template('home.html', writer=data[2], quote=data[1], keyword_value=keyword, quote_id=data[0],
-                           isHidden=isHidden)
+                           isHidden=is_hidden, islogged=is_logged)
 
 
 @app.route('/random')
 def home_page():
     data = get_quote_random()
-    return render_template('random.html', writer=data[2], quote=data[1])
+    return render_template('random.html', writer=data[1], quote=data[0])
 
 
 @app.route('/about')
@@ -186,6 +178,7 @@ def auth_page():
             else:
                 if password == user[2]:
                     session['api_key'] = user[3]
+                    session['username'] = user[1]
                     session['user_logged'] = True
                     return redirect(url_for('generateKey'))
                 else:
@@ -208,6 +201,7 @@ def auth_page():
                 if id is not None:
                     session['api_key'] = apikey
                     session['user_logged'] = True
+                    session['username'] = username
                     return redirect(url_for('generateKey'))
                 else:
                     prompt = "Username '{}' exist, try another.".format(username)
@@ -232,20 +226,20 @@ def generateKey():
 def logout():
     session.pop('user_logged', None)
     session.pop('api_key', None)
+    session.pop('username',None)
     return redirect(url_for('auth_page'))
 
 
 @app.route('/giveRating', methods=['POST'])
 def giveRating():
-    # TODO : 404 için rate i kapat
     star = request.form.get('rating')
     quote_id = request.form.get('quote_id')
-    keyword = request.form.get('keyword')
-    SQL = "SELECT * FROM {} WHERE id={}".format(keyword, quote_id)
+    #keyword = request.form.get('keyword')
+    SQL = "SELECT * FROM quotes WHERE id={}".format (quote_id)
     curr.execute(SQL)
     data = curr.fetchone()
-    votes = data[3]
-    rate = data[4]
+    votes = data[2]
+    rate = data[3]
     new_rate = 0
     if star == "star-5":
         new_rate = 5
@@ -261,7 +255,7 @@ def giveRating():
     rate = float(rate * votes + new_rate) / float(votes + 1)
     votes = votes + 1
 
-    SQL = "UPDATE {} SET rate={}, votes={} WHERE id={}".format(keyword, rate, votes, quote_id)
+    SQL = "UPDATE quotes SET rate={}, votes={} WHERE id={}".format(rate, votes, quote_id)
     curr.execute(SQL)
     conn.commit()
     return jsonify({
@@ -269,61 +263,138 @@ def giveRating():
         'rating': star
     })
 
+@app.route('/feedback', methods=['POST'])
+def feedback():
+    comment = request.form.get('comment')
+    quote_id = request.form.get('quote_id')
+    username = session['username']
+
+    SQL = "INSERT INTO comments(user_id, quote_id, comment) VALUES ( (SELECT id FROM users WHERE username='{}'), {}, '{}')".format(username,quote_id,comment)
+    curr.execute(SQL)
+    conn.commit()
+
+    return jsonify({
+        'status': 'OK'
+    })
+
+@app.route('/addNew', methods=['GET','POST'])
+def addNew():
+    SQL = "SELECt keyword FROM categories"
+    curr.execute(SQL)
+    categories = ''
+
+    if session.get('user_logged'):
+        prompt_hidden = "hidden"
+        btn_hidden = ""
+    else:
+        prompt_hidden = ""
+        btn_hidden = "hidden"
+    for x in curr.fetchall():
+        if x[0] != "notfound":
+            categories += "<option value=" + "{}>".format(x[0]) + x[0] + "</option>"
+
+    if request.method == "POST":
+        quote = request.form.get('quote')
+        writer = request.form.get('writer')
+        keyword = request.form.get('sel1')
+        if session.get('username'):
+            username = session['username']
+            #if user is admin he can directly add to the main quotes table
+            if username == "admin":
+                SQL = "SELECT id FROM writers WHERE writer = '{}'".format(writer)
+                curr.execute(SQL)
+                writer_id = curr.fetchone()
+
+                SQL = "SELECT id from categories WHERE keyword = '{}'".format(keyword)
+                curr.execute(SQL)
+                category_id = curr.fetchone()[0]
+
+                if writer_id:
+                    # writer is in database
+                    writer_id = writer_id[0]
+                else:
+                    # writer is not in database
+                    # insert writer than return id
+                    SQL = "INSERT INTO writers(writer) VALUES ('{}') RETURNING id".format(writer)
+                    curr.execute(SQL)
+                    conn.commit()
+                    writer_id =  curr.fetchone()[0]
+
+                SQL = "INSERT INTO quotes(quote, category_id, writer_id) VALUES ('{}', {}, {})".format(quote, category_id, writer_id)
+
+            else:
+                SQL = "INSERT INTO user_quotes(user_id, quote, writer, category_id) VALUES  \
+                  ((SELECT id FROM users WHERE username = '{}'),'{}','{}',(SELECT id FROM categories WHERE keyword = '{}'))".format(username,quote,writer,keyword)
+
+            curr.execute(SQL)
+            conn.commit()
+
+    return render_template("addNew.html", categoryList=categories, promptHidden=prompt_hidden, btnHidden=btn_hidden, prompt='')
+
 
 @app.route('/demo', methods=['GET', 'POST'])
 def demo():
+    DEMO_DIR = os.path.dirname(os.path.abspath(__file__)) + '/static/demo/'
+
     if request.method == 'POST':
         data = ''
         if request.form['btn'] == 'Create':
-            SQL = "INSERT INTO categories(keyword) VALUES ('science') ON CONFLICT DO NOTHING "
-            curr.execute(SQL)
-            conn.commit()
-            SQL = ("CREATE TABLE IF NOT EXISTS science("
-                   "id SERIAL PRIMARY KEY,"
-                   "quote VARCHAR(255) DEFAULT NULL ,"
-                   "writer VARCHAR(20) DEFAULT NULL ,"
-                   "votes INTEGER DEFAULT 0,"
-                   "rate DOUBLE PRECISION DEFAULT 0)")
-            curr.execute(SQL)
-            conn.commit()
-            data = "Table created."
+            path = os.path.join(DEMO_DIR,'create.txt')
+            with open(path) as f:
+                read_data = f.read()
+            try:
+                curr.execute(read_data)
+                conn.commit()
+                data = "Tables created."
+            except psycopg2.Error as e:
+                data = e.diag.message_primary
+
         elif request.form['btn'] == 'Insert':
-            SQL = (
-                "INSERT INTO science(quote, writer) VALUES ('Two things are infinite: the universe and human stupidity; and I''m not sure about the universe.','Albert Einstein');"
-                "INSERT INTO science(quote, writer) VALUES ('The saddest aspect of life right now is that science gathers knowledge faster than society gathers wisdom.','Isaac Asimov');"
-                "INSERT INTO science(quote, writer) VALUES ('Never memorize something that you can look up.','Albert Einstein');"
-                "INSERT INTO science(quote, writer) VALUES ('We are stuck with technology when what we really want is just stuff that works.','Douglas Adams');"
-                "INSERT INTO science(quote, writer) VALUES ('The scientist is not a person who gives the right answers, he''s one who asks the right questions.','Claude Lévi-Strauss');"
-                "INSERT INTO science(quote, writer) VALUES ('I learned very early the difference between knowing the name of something and knowing something.','Richard Feynman');"
-                "INSERT INTO science(quote, writer) VALUES ('Millions saw the apple fall, Newton was the only one who asked why?','Bernard Baruch');"
-                "INSERT INTO science(quote, writer) VALUES ('The most beautiful experience we can have is the mysterious. It is the fundamental emotion that stands at the cradle of true art and true science','Albert Einstein');")
-            curr.execute(SQL)
-            conn.commit()
-            data = "Rows inserted."
+            path = os.path.join(DEMO_DIR, 'insert.txt')
+            with open(path) as f:
+                read_data = f.read()
+            try:
+                curr.execute(read_data)
+                conn.commit()
+                data = "Tables inserted."
+            except psycopg2.Error as e:
+                data = e.diag.message_primary
+
         elif request.form['btn'] == 'Update':
-            SQL = "SELECT * FROM science"
-            curr.execute(SQL)
-            index = curr.fetchone()[0]
-            SQL = (
-                "UPDATE science SET quote = 'An expert is a person who has made all the mistakes that can be made in a very narrow field.', writer = 'Niels Bohr' WHERE id = {}").format(
-                index)
-            curr.execute(SQL)
-            conn.commit()
-            data = "Update successful."
+            path = os.path.join(DEMO_DIR, 'update.txt')
+            with open(path) as f:
+                read_data = f.read()
+            try:
+                curr.execute(read_data)
+                conn.commit()
+                data = "Update successful."
+            except psycopg2.Error as e:
+                data = e.diag.message_primary
+
         elif request.form['btn'] == 'Select':
-            SQL = "SELECT * FROM science"
-            curr.execute(SQL)
-            data = curr.fetchone()
+            path = os.path.join(DEMO_DIR, 'select.txt')
+            with open(path) as f:
+                read_data = f.read()
+            try:
+                curr.execute(read_data)
+                conn.commit()
+                data = curr.fetchone()[1]
+            except psycopg2.Error as e:
+                data = e.diag.message_primary
+
+
         elif request.form['btn'] == 'Delete':
-            SQL = ("DELETE FROM categories WHERE keyword='science';"
-                   "DROP TABLE science;")
-            curr.execute(SQL)
-            conn.commit()
-            data = "Table deleted."
-        if request.form['btn'] == 'Select':
-            return render_template("demo.html", result=data[1])
-        else:
-            return render_template("demo.html", result=data)
+            path = os.path.join(DEMO_DIR, 'delete.txt')
+            with open(path) as f:
+                read_data = f.read()
+            try:
+                curr.execute(read_data)
+                conn.commit()
+                data = "All tables deleted."
+            except psycopg2.Error as e:
+                data = e.diag.message_primary
+
+        return render_template("demo.html", result=data)
     elif request.method == 'GET':
         return render_template("demo.html", result='')
 
@@ -350,11 +421,8 @@ if __name__ == '__main__':
     if VCAP_SERVICES is not None:
         app.config['dsn'] = get_elephantsql_dsn(VCAP_SERVICES)
     else:
-        uri = os.getenv('TRAVIS_ENV')
-        match = re.match('postgres://(.*?):(.*?)@(.*?)(:(\d+))?/(.*)', uri)
-        user, password, host, _, port, dbname = match.groups()
         dsn = """user='{}' password='{}' host='{}' port={}
-             dbname='{}'""".format(user, password, host, port, dbname)
+             dbname='{}'""".format("", "", "localhost", 5432, "postgres")
         app.config['dsn'] = dsn
 
     conn = psycopg2.connect(app.config['dsn'])
