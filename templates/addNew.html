@@ -3,31 +3,22 @@
 <html lang="en">
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <meta name="description" content="Quote Generator API and demo site">
     <meta name="author" content="Muhammet Uçan">
     <link rel="icon" type="image/ico" href="/img/favicon.ico">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
-
-
     <title>Add New Quote</title>
-
     <!-- Bootstrap core CSS -->
     <link rel="stylesheet" href="{{ url_for('static', filename='/css/bootstrap.min.css') }}"/>
-
     <!-- Custom styles for this template -->
     <link rel="stylesheet" href="{{ url_for('static', filename='/cover.css') }}"/>
 </head>
 
 <body>
-
 <div class="site-wrapper">
-
     <div class="site-wrapper-inner">
-
         <div class="cover-container">
-
             <div class="masthead clearfix">
                 <div class="inner">
                     <a class="lead masthead-brand" style="text-decoration: none; font-size: x-large"
@@ -41,17 +32,18 @@
                     </nav>
                 </div>
             </div>
-
             <div class="inner cover">
                 <form action=" {{ url_for('addNew') }} " method="post">
                     <h5>Send new quote using below from</h5>
                     <br>
                     <div class="form-group">
-                        <input type="text" style="resize: none" placeholder="Enter your quote here" class="form-control" rows="3" name="quote" id="quote" maxlength="200"></input>
+                        <input type="text" style="resize: none" placeholder="Enter your quote here" class="form-control"
+                               rows="3" name="quote" id="quote" maxlength="200"></input>
                         <div id="quoteHelp" class="form-text text-muted"></div>
                         <br>
 
-                        <input type="text" class="form-control" maxlength="20" id="writer" name="writer" placeholder="Writer of the Quote">
+                        <input type="text" class="form-control" maxlength="20" id="writer" name="writer"
+                               placeholder="Writer of the Quote">
                         <div id="writerHelp" class="form-text text-muted"></div>
                         <label style="margin-top: 5px" for="sel1">Select category:</label>
 
@@ -60,7 +52,9 @@
                         </select>
                     </div>
                     <p {{ promptHidden }} class="form-text text-muted">Login in order to send quotes</p>
-                    <button {{ btnHidden }} type="submit" id="generate-btn" class="btn btn-primary" name="btn" value="Generate">Send</button>
+                    <button {{ btnHidden }} type="submit" id="generate-btn" class="btn btn-primary" name="btn"
+                                            value="Generate">Send
+                    </button>
                     <small class="alert"> {{ prompt }} </small>
                 </form>
             </div>
@@ -70,37 +64,32 @@
                     <p>Quote generator api, by <a href="https://twitter.com/mhmmtucan">@mhmmtucan</a>.</p>
                 </div>
             </div>
-
         </div>
-
     </div>
-
 </div>
-
 </body>
 
-
 <script>
-    $(document).ready(function() {
-    var quote_max = 200;
-    var writer_max = 20;
+    $(document).ready(function () {
+        var quote_max = 200;
+        var writer_max = 20;
 
-    $('#quoteHelp').html(quote_max + ' characters remaining');
-    $('#writerHelp').html(writer_max + ' characters remaining');
+        $('#quoteHelp').html(quote_max + ' characters remaining');
+        $('#writerHelp').html(writer_max + ' characters remaining');
 
-    $('#quote').keyup(function() {
-        var text_length = $('#quote').val().length;
-        var text_remaining = quote_max - text_length;
+        $('#quote').keyup(function () {
+            var text_length = $('#quote').val().length;
+            var text_remaining = quote_max - text_length;
 
-        $('#quoteHelp').html(text_remaining + ' characters remaining');
+            $('#quoteHelp').html(text_remaining + ' characters remaining');
+        });
+
+        $('#writer').keyup(function () {
+            var text_length = $('#writer').val().length;
+            var text_remaining = writer_max - text_length;
+
+            $('#writerHelp').html(text_remaining + ' characters remaining');
+        });
     });
-
-    $('#writer').keyup(function() {
-        var text_length = $('#writer').val().length;
-        var text_remaining = writer_max - text_length;
-
-        $('#writerHelp').html(text_remaining + ' characters remaining');
-    });
-});
 </script>
 </html>

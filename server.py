@@ -1,11 +1,10 @@
 #!flask/bin/python
-from random import randint
-
 import binascii
 import json
 import os
-import psycopg2
 import re
+
+import psycopg2
 from flask import Flask, jsonify, abort, request, make_response, url_for, render_template, redirect, session
 from flask_httpauth import HTTPBasicAuth
 
@@ -57,7 +56,8 @@ def get_quote_random():
 
 # take quote with keyword
 def get_quote_with_keyword(keyword):
-    SQL = "SELECT EXISTS (SELECT 1 FROM categories,quotes WHERE (quotes.category_id = categories.id) AND (keyword = '{}'))".format(keyword)
+    SQL = "SELECT EXISTS (SELECT 1 FROM categories,quotes WHERE (quotes.category_id = categories.id) AND (keyword = '{}'))".format(
+        keyword)
     curr.execute(SQL)
     category_exists = curr.fetchone()[0]
 
@@ -73,6 +73,7 @@ def get_quote_with_keyword(keyword):
     curr.execute(SQL)
     quote = curr.fetchone()
     return quote
+
 
 @app.route('/quote/api/v1.0/random', methods=['GET'])
 @auth.login_required
@@ -129,7 +130,7 @@ def keyword():
     if request.method == 'POST':
         keyword = request.form.get('keyword')
     elif request.method == 'GET':
-        SQL = "SELECT keyword from categories WHERE (keyword NOT IN ('notfound'))ORDER BY random() LIMIT 1"
+        SQL = "SELECT keyword FROM categories WHERE (keyword NOT IN ('notfound'))ORDER BY random() LIMIT 1"
         curr.execute(SQL)
         keyword = curr.fetchone()[0]
 
@@ -226,7 +227,7 @@ def generateKey():
 def logout():
     session.pop('user_logged', None)
     session.pop('api_key', None)
-    session.pop('username',None)
+    session.pop('username', None)
     return redirect(url_for('auth_page'))
 
 
@@ -234,8 +235,8 @@ def logout():
 def giveRating():
     star = request.form.get('rating')
     quote_id = request.form.get('quote_id')
-    #keyword = request.form.get('keyword')
-    SQL = "SELECT * FROM quotes WHERE id={}".format (quote_id)
+    # keyword = request.form.get('keyword')
+    SQL = "SELECT * FROM quotes WHERE id={}".format(quote_id)
     curr.execute(SQL)
     data = curr.fetchone()
     votes = data[2]
@@ -263,13 +264,15 @@ def giveRating():
         'rating': star
     })
 
+
 @app.route('/feedback', methods=['POST'])
 def feedback():
     comment = request.form.get('comment')
     quote_id = request.form.get('quote_id')
     username = session['username']
 
-    SQL = "INSERT INTO comments(user_id, quote_id, comment) VALUES ( (SELECT id FROM users WHERE username='{}'), {}, '{}')".format(username,quote_id,comment)
+    SQL = "INSERT INTO comments(user_id, quote_id, comment) VALUES ( (SELECT id FROM users WHERE username='{}'), {}, '{}')".format(
+        username, quote_id, comment)
     curr.execute(SQL)
     conn.commit()
 
@@ -277,9 +280,10 @@ def feedback():
         'status': 'OK'
     })
 
-@app.route('/addNew', methods=['GET','POST'])
+
+@app.route('/addNew', methods=['GET', 'POST'])
 def addNew():
-    SQL = "SELECt keyword FROM categories"
+    SQL = "SELECT keyword FROM categories"
     curr.execute(SQL)
     categories = ''
 
@@ -299,7 +303,7 @@ def addNew():
         keyword = request.form.get('sel1')
         if session.get('username'):
             username = session['username']
-            #if user is admin he can directly add to the main quotes table
+            # if user is admin he can directly add to the main quotes table
             if username == "admin":
                 SQL = "SELECT id FROM writers WHERE writer = '{}'".format(writer)
                 curr.execute(SQL)
@@ -318,18 +322,22 @@ def addNew():
                     SQL = "INSERT INTO writers(writer) VALUES ('{}') RETURNING id".format(writer)
                     curr.execute(SQL)
                     conn.commit()
-                    writer_id =  curr.fetchone()[0]
+                    writer_id = curr.fetchone()[0]
 
-                SQL = "INSERT INTO quotes(quote, category_id, writer_id) VALUES ('{}', {}, {})".format(quote, category_id, writer_id)
+                SQL = "INSERT INTO quotes(quote, category_id, writer_id) VALUES ('{}', {}, {})".format(quote,
+                                                                                                       category_id,
+                                                                                                       writer_id)
 
             else:
                 SQL = "INSERT INTO user_quotes(user_id, quote, writer, category_id) VALUES  \
-                  ((SELECT id FROM users WHERE username = '{}'),'{}','{}',(SELECT id FROM categories WHERE keyword = '{}'))".format(username,quote,writer,keyword)
+                  ((SELECT id FROM users WHERE username = '{}'),'{}','{}',(SELECT id FROM categories WHERE keyword = '{}'))".format(
+                    username, quote, writer, keyword)
 
             curr.execute(SQL)
             conn.commit()
 
-    return render_template("addNew.html", categoryList=categories, promptHidden=prompt_hidden, btnHidden=btn_hidden, prompt='')
+    return render_template("addNew.html", categoryList=categories, promptHidden=prompt_hidden, btnHidden=btn_hidden,
+                           prompt='')
 
 
 @app.route('/demo', methods=['GET', 'POST'])
@@ -339,7 +347,7 @@ def demo():
     if request.method == 'POST':
         data = ''
         if request.form['btn'] == 'Create':
-            path = os.path.join(DEMO_DIR,'create.txt')
+            path = os.path.join(DEMO_DIR, 'create.txt')
             with open(path) as f:
                 read_data = f.read()
             try:

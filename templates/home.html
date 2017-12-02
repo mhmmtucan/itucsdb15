@@ -59,38 +59,46 @@
                         </small>
 
                     </div>
-                    <button type="submit" id="generate-btn" class="btn btn-primary" name="btn" value="Generate">Generate</button>
+                    <button type="submit" id="generate-btn" class="btn btn-primary" name="btn" value="Generate">
+                        Generate
+                    </button>
                 </form>
                 <br>
-                <button type="button" class="btn btn-secondary" data-toggle="modal" data-target="#feedback" {{ islogged }}>Give Feedback</button>
+                <button type="button" class="btn btn-secondary" data-toggle="modal"
+                        data-target="#feedback" {{ islogged }}>Give Feedback
+                </button>
 
                 <!-- Modal -->
-                <div style="color: black" class="modal fade" id="feedback" tabindex="-1" role="dialog" aria-labelledby="modalTitle" aria-hidden="true" >
-                  <div class="modal-dialog" role="document">
-                    <div class="modal-content">
-                      <div class="modal-header">
-                        <h5 class="modal-title" id="modalTitle">Give Feedback</h5>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                          <span aria-hidden="true">&times;</span>
-                        </button>
-                      </div>
-                      <div class="modal-body">
-                          <p > Tell us what you think about this quote. Every type of feedback is acceptable</p>
-                          <p > Do you like it?</p>
-                          <p > What is the reason for that?</p>
-                          <p > Is it relavent with the keyword?</p>
-                          <div class="form-group">
-                           <label for="comment">Comment:</label>
-                           <textarea style="resize: none" class="form-control" rows="7" id="comment" maxlength="280"></textarea>
-                              <div id="textarea_count"></div>
-                          </div>
-                      </div>
-                      <div class="modal-footer">
-                        <button type="button" if="modal_dismiss_btn"class="btn btn-secondary" data-dismiss="modal">Close</button>
-                        <button type="button" id="modal_btn" class="btn btn-primary">Send</button>
-                      </div>
+                <div style="color: black" class="modal fade" id="feedback" tabindex="-1" role="dialog"
+                     aria-labelledby="modalTitle" aria-hidden="true">
+                    <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="modalTitle">Give Feedback</h5>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                            <div class="modal-body">
+                                <p> Tell us what you think about this quote. Every type of feedback is acceptable</p>
+                                <p> Do you like it?</p>
+                                <p> What is the reason for that?</p>
+                                <p> Is it relavent with the keyword?</p>
+                                <div class="form-group">
+                                    <label for="comment">Comment:</label>
+                                    <textarea style="resize: none" class="form-control" rows="7" id="comment"
+                                              maxlength="280"></textarea>
+                                    <div id="textarea_count"></div>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" if="modal_dismiss_btn" class="btn btn-secondary"
+                                        data-dismiss="modal">Close
+                                </button>
+                                <button type="button" id="modal_btn" class="btn btn-primary">Send</button>
+                            </div>
+                        </div>
                     </div>
-                  </div>
                 </div>
                 <br>
                 <br>
@@ -130,8 +138,6 @@
     </div>
 
 </div>
-<!-- Uncomment demo link bofore demo -->
-
 </body>
 
 <script>
@@ -161,16 +167,16 @@
         });
     });
 
-    $(document).ready(function() {
-    var text_max = 280;
-    $('#textarea_count').html(text_max + ' characters remaining');
+    $(document).ready(function () {
+        var text_max = 280;
+        $('#textarea_count').html(text_max + ' characters remaining');
 
-    $('#comment').keyup(function() {
-        var text_length = $('#comment').val().length;
-        var text_remaining = text_max - text_length;
+        $('#comment').keyup(function () {
+            var text_length = $('#comment').val().length;
+            var text_remaining = text_max - text_length;
 
-        $('#textarea_count').html(text_remaining + ' characters remaining');
+            $('#textarea_count').html(text_remaining + ' characters remaining');
+        });
     });
-});
 </script>
 </html>
