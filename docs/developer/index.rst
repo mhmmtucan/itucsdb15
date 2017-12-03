@@ -42,8 +42,8 @@ Web Client and backend
 .. code-block:: python
 
     def get_quote_random():
-        SQL = "SELECT quote,writer FROM quotes,writers,categories WHERE (quotes.writer_id = writers.id) AND \
-                (quotes.category_id = categories.id) AND \
+        SQL = "SELECT quote,writer FROM quotes,writers,categories WHERE (quotes.writer_id = writers.id) \ 
+                AND (quotes.category_id = categories.id) AND \
                 (categories.keyword NOT IN ('notfound')) ORDER BY random() LIMIT 1"
         curr.execute(SQL)
         quote = curr.fetchone()
@@ -110,61 +110,61 @@ on the home page, then it will be a POST request. Because of this, rather than g
 
 .. code-block:: python
 
-@app.route('/authentication', methods=['GET', 'POST'])
-def auth_page():
-    if request.method == 'POST':
-        username = request.form.get('username')
-        password = request.form.get('password')
-        if request.form['btn'] == 'Login':
-            # do login
-            SQL = "SELECT * FROM users WHERE username='{}'".format(username)
-            curr.execute(SQL)
-            user = curr.fetchone()
-
-            if username == "" or password == "":
-                return render_template('auth.html', prompt="Form field should be filled")
-            elif user is None:
-                return render_template('auth.html', prompt="Are you sure about that username?")
-            else:
-                if password == user[2]:
-                    session['api_key'] = user[3]
-                    session['username'] = user[1]
-                    session['user_logged'] = True
-                    return redirect(url_for('generateKey'))
-                else:
-                    return render_template('auth.html', prompt="Password invalid.")
-
-        elif request.form['btn'] == 'Create':
-            # do create
-            if username == "":
-                return render_template('auth.html', prompt="An user without name, are you robot?")
-            elif password == "":
-                return render_template('auth.html', prompt="Enter a pass, that might be helpful.")
-            else:
-                apikey = binascii.hexlify(os.urandom(12)).decode('utf-8')
-                SQL = "INSERT INTO users (username, password, api_key) " \
-                      "SELECT '{}', '{}', '{}' WHERE NOT EXISTS \ 
-                      (SELECT id FROM users WHERE username='{}') \
-                      RETURNING id;".format(username, password, apikey, username)
+    @app.route('/authentication', methods=['GET', 'POST'])
+    def auth_page():
+        if request.method == 'POST':
+            username = request.form.get('username')
+            password = request.form.get('password')
+            if request.form['btn'] == 'Login':
+                # do login
+                SQL = "SELECT * FROM users WHERE username='{}'".format(username)
                 curr.execute(SQL)
-                conn.commit()
-                id = curr.fetchone()
-                if id is not None:
-                    session['api_key'] = apikey
-                    session['user_logged'] = True
-                    session['username'] = username
-                    return redirect(url_for('generateKey'))
-                else:
-                    prompt = "Username '{}' exist, try another.".format(username)
-                    return render_template('auth.html', prompt=prompt)
+                user = curr.fetchone()
 
-    elif request.method == 'GET':
-        # if user logged in direct to generateKey
-        if session.get('user_logged'):
-            if session['user_logged']:
-                return render_template('generateKey.html', apikey=session['api_key'])
-        else:
-            return render_template('auth.html')
+                if username == "" or password == "":
+                    return render_template('auth.html', prompt="Form field should be filled")
+                elif user is None:
+                    return render_template('auth.html', prompt="Are you sure about that username?")
+                else:
+                    if password == user[2]:
+                        session['api_key'] = user[3]
+                        session['username'] = user[1]
+                        session['user_logged'] = True
+                        return redirect(url_for('generateKey'))
+                    else:
+                        return render_template('auth.html', prompt="Password invalid.")
+
+            elif request.form['btn'] == 'Create':
+                # do create
+                if username == "":
+                    return render_template('auth.html', prompt="An user without name, are you robot?")
+                elif password == "":
+                    return render_template('auth.html', prompt="Enter a pass, that might be helpful.")
+                else:
+                    apikey = binascii.hexlify(os.urandom(12)).decode('utf-8')
+                    SQL = "INSERT INTO users (username, password, api_key) " \
+                          "SELECT '{}', '{}', '{}' WHERE NOT EXISTS \ 
+                          (SELECT id FROM users WHERE username='{}') \
+                          RETURNING id;".format(username, password, apikey, username)
+                    curr.execute(SQL)
+                    conn.commit()
+                    id = curr.fetchone()
+                    if id is not None:
+                        session['api_key'] = apikey
+                        session['user_logged'] = True
+                        session['username'] = username
+                        return redirect(url_for('generateKey'))
+                    else:
+                        prompt = "Username '{}' exist, try another.".format(username)
+                        return render_template('auth.html', prompt=prompt)
+
+        elif request.method == 'GET':
+            # if user logged in direct to generateKey
+            if session.get('user_logged'):
+                if session['user_logged']:
+                    return render_template('generateKey.html', apikey=session['api_key'])
+            else:
+                return render_template('auth.html')
 
 This code block provides function to create account or login. If user created an account it will redirect user to authentication page.
 When user try to create an account if the input fields are valid, function will make a request to database in order to insert username. 
@@ -175,57 +175,58 @@ Function will also keep some session variables in order to remember that user lo
 
 .. code-block:: python
 
-@app.route('/giveRating', methods=['POST'])
-def giveRating():
-    star = request.form.get('rating')
-    quote_id = request.form.get('quote_id')
-    # keyword = request.form.get('keyword')
-    SQL = "SELECT * FROM quotes WHERE id={}".format(quote_id)
-    curr.execute(SQL)
-    data = curr.fetchone()
-    votes = data[2]
-    rate = data[3]
-    new_rate = 0
-    if star == "star-5":
-        new_rate = 5
-    elif star == "star-4":
-        new_rate = 4
-    elif star == "star-3":
-        new_rate = 3
-    elif star == "star-2":
-        new_rate = 2
-    elif star == "star-1":
-        new_rate = 1
+    @app.route('/giveRating', methods=['POST'])
+    def giveRating():
+        star = request.form.get('rating')
+        quote_id = request.form.get('quote_id')
+        # keyword = request.form.get('keyword')
+        SQL = "SELECT * FROM quotes WHERE id={}".format(quote_id)
+        curr.execute(SQL)
+        data = curr.fetchone()
+        votes = data[2]
+        rate = data[3]
+        new_rate = 0
+        if star == "star-5":
+            new_rate = 5
+        elif star == "star-4":
+            new_rate = 4
+        elif star == "star-3":
+            new_rate = 3
+        elif star == "star-2":
+            new_rate = 2
+        elif star == "star-1":
+            new_rate = 1
 
-    rate = float(rate * votes + new_rate) / float(votes + 1)
-    votes = votes + 1
+        rate = float(rate * votes + new_rate) / float(votes + 1)
+        votes = votes + 1
 
-    SQL = "UPDATE quotes SET rate={}, votes={} WHERE id={}".format(rate, votes, quote_id)
-    curr.execute(SQL)
-    conn.commit()
-    return jsonify({
-        'status': 'OK',
-        'rating': star
-    })
+        SQL = "UPDATE quotes SET rate={}, votes={} WHERE id={}".format(rate, votes, quote_id)
+        curr.execute(SQL)
+        conn.commit()
+        return jsonify({
+            'status': 'OK',
+            'rating': star
+        })
 
 
 .. code-block:: javascript
 
-$(function () {
-        $('.star').click(function (input) {
-            if ($(this).is(':checked')) {
-                var star = input.target.id;
-                var quote_id = $('#quote-id').html();
-                var keyword = '{{ keyword_value }}';
-                $.post('/giveRating', {rating: star, quote_id: quote_id, keyword: keyword}, function (result) {
-                    setTimeout(function () {
-                        $('#thankYou').fadeIn(4000);
-                    }, 1500);
-                    $('#ratingFrom').fadeOut(1500);
-                })
-            }
+    $(function () {
+            $('.star').click(function (input) {
+                if ($(this).is(':checked')) {
+                    var star = input.target.id;
+                    var quote_id = $('#quote-id').html();
+                    var keyword = '{{ keyword_value }}';
+                    $.post('/giveRating', {rating: star, quote_id: quote_id, keyword: keyword}, 
+                    function (result) {
+                        setTimeout(function () {
+                            $('#thankYou').fadeIn(4000);
+                        }, 1500);
+                        $('#ratingFrom').fadeOut(1500);
+                    })
+                }
+            });
         });
-    });
 
 |giveRating.png|
 
@@ -236,63 +237,63 @@ This function will use this information and update the votes and rating in the d
 
 .. code-block:: python
 
-@app.route('/addNew', methods=['GET', 'POST'])
-def addNew():
-    SQL = "SELECT keyword FROM categories"
-    curr.execute(SQL)
-    categories = ''
+    @app.route('/addNew', methods=['GET', 'POST'])
+    def addNew():
+        SQL = "SELECT keyword FROM categories"
+        curr.execute(SQL)
+        categories = ''
 
-    if session.get('user_logged'):
-        prompt_hidden = "hidden"
-        btn_hidden = ""
-    else:
-        prompt_hidden = ""
-        btn_hidden = "hidden"
-    for x in curr.fetchall():
-        if x[0] != "notfound":
-            categories += "<option value=" + "{}>".format(x[0]) + x[0] + "</option>"
+        if session.get('user_logged'):
+            prompt_hidden = "hidden"
+            btn_hidden = ""
+        else:
+            prompt_hidden = ""
+            btn_hidden = "hidden"
+        for x in curr.fetchall():
+            if x[0] != "notfound":
+                categories += "<option value=" + "{}>".format(x[0]) + x[0] + "</option>"
 
-    if request.method == "POST":
-        quote = request.form.get('quote')
-        writer = request.form.get('writer')
-        keyword = request.form.get('sel1')
-        if session.get('username'):
-            username = session['username']
-            # if user is admin he can directly add to the main quotes table
-            if username == "admin":
-                SQL = "SELECT id FROM writers WHERE writer = '{}'".format(writer)
-                curr.execute(SQL)
-                writer_id = curr.fetchone()
-
-                SQL = "SELECT id from categories WHERE keyword = '{}'".format(keyword)
-                curr.execute(SQL)
-                category_id = curr.fetchone()[0]
-
-                if writer_id:
-                    # writer is in database
-                    writer_id = writer_id[0]
-                else:
-                    # writer is not in database
-                    # insert writer than return id
-                    SQL = "INSERT INTO writers(writer) VALUES ('{}') RETURNING id".format(writer)
+        if request.method == "POST":
+            quote = request.form.get('quote')
+            writer = request.form.get('writer')
+            keyword = request.form.get('sel1')
+            if session.get('username'):
+                username = session['username']
+                # if user is admin he can directly add to the main quotes table
+                if username == "admin":
+                    SQL = "SELECT id FROM writers WHERE writer = '{}'".format(writer)
                     curr.execute(SQL)
-                    conn.commit()
-                    writer_id = curr.fetchone()[0]
+                    writer_id = curr.fetchone()
 
-                SQL = "INSERT INTO quotes(quote, category_id, writer_id) \ 
-                VALUES ('{}', {}, {})".format(quote, category_id, writer_id)
+                    SQL = "SELECT id from categories WHERE keyword = '{}'".format(keyword)
+                    curr.execute(SQL)
+                    category_id = curr.fetchone()[0]
 
-            else:
-                SQL = "INSERT INTO user_quotes(user_id, quote, writer, category_id) VALUES  \
-                  ((SELECT id FROM users WHERE username = '{}'),'{}','{}',\
-                  (SELECT id FROM categories WHERE keyword = '{}'))".format(
-                    username, quote, writer, keyword)
+                    if writer_id:
+                        # writer is in database
+                        writer_id = writer_id[0]
+                    else:
+                        # writer is not in database
+                        # insert writer than return id
+                        SQL = "INSERT INTO writers(writer) VALUES ('{}') RETURNING id".format(writer)
+                        curr.execute(SQL)
+                        conn.commit()
+                        writer_id = curr.fetchone()[0]
 
-            curr.execute(SQL)
-            conn.commit()
+                    SQL = "INSERT INTO quotes(quote, category_id, writer_id) \ 
+                    VALUES ('{}', {}, {})".format(quote, category_id, writer_id)
 
-    return render_template("addNew.html", categoryList=categories, promptHidden=prompt_hidden, 
-                          btnHidden=btn_hidden, prompt='')
+                else:
+                    SQL = "INSERT INTO user_quotes(user_id, quote, writer, category_id) VALUES  \
+                      ((SELECT id FROM users WHERE username = '{}'),'{}','{}',\
+                      (SELECT id FROM categories WHERE keyword = '{}'))".format(
+                        username, quote, writer, keyword)
+
+                curr.execute(SQL)
+                conn.commit()
+
+        return render_template("addNew.html", categoryList=categories, promptHidden=prompt_hidden, 
+                              btnHidden=btn_hidden, prompt='')
 
 
 This code block handles adding new quotes to database using web interface. It will give different behaviours whether the user 
@@ -309,53 +310,53 @@ Errors and necessity of authentication provided using these functions
 
 .. code-block:: python
 
-@app.route('/quote/api/v1.0/random', methods=['GET'])
-@auth.login_required
-def get_random():
-    quote = get_quote_random()
-    if 'ApiKey' not in request.headers:
-        return make_response(jsonify({'error': 'Add ApiKey to header'}), 400)
-    api_key = request.headers['ApiKey']
-    api_key_exist_in_db = False
-    SQL = "SELECT id from users WHERE api_key='{}'".format(api_key)
+    @app.route('/quote/api/v1.0/random', methods=['GET'])
+    @auth.login_required
+    def get_random():
+        quote = get_quote_random()
+        if 'ApiKey' not in request.headers:
+            return make_response(jsonify({'error': 'Add ApiKey to header'}), 400)
+        api_key = request.headers['ApiKey']
+        api_key_exist_in_db = False
+        SQL = "SELECT id from users WHERE api_key='{}'".format(api_key)
 
-    if api_key != "":
-        curr.execute(SQL)
-        if curr.fetchone() is not None: api_key_exist_in_db = True
+        if api_key != "":
+            curr.execute(SQL)
+            if curr.fetchone() is not None: api_key_exist_in_db = True
 
-    if api_key == "" or not api_key_exist_in_db:
-        return make_response(jsonify({'error': 'ApiKey Missing or Wrong'}), 400)
-    else:
-        return jsonify({
-            'quote': quote[1],
-            'writer': quote[2]
-        })
+        if api_key == "" or not api_key_exist_in_db:
+            return make_response(jsonify({'error': 'ApiKey Missing or Wrong'}), 400)
+        else:
+            return jsonify({
+                'quote': quote[1],
+                'writer': quote[2]
+            })
 
 
-@app.route('/quote/api/v1.0/<string:keyword>', methods=['GET'])
-@auth.login_required
-def get_with_keyword(keyword):
-    quote = get_quote_with_keyword(keyword=keyword)
+    @app.route('/quote/api/v1.0/<string:keyword>', methods=['GET'])
+    @auth.login_required
+    def get_with_keyword(keyword):
+        quote = get_quote_with_keyword(keyword=keyword)
 
-    if 'ApiKey' not in request.headers:
-        return make_response(jsonify({'error': 'Add ApiKey to header'}), 400)
-    api_key = request.headers['ApiKey']
-    api_key_exist_in_db = False
-    SQL = "SELECT id from users WHERE api_key='{}'".format(api_key)
+        if 'ApiKey' not in request.headers:
+            return make_response(jsonify({'error': 'Add ApiKey to header'}), 400)
+        api_key = request.headers['ApiKey']
+        api_key_exist_in_db = False
+        SQL = "SELECT id from users WHERE api_key='{}'".format(api_key)
 
-    if api_key != "":
-        curr.execute(SQL)
-        if curr.fetchone() is not None: api_key_exist_in_db = True
+        if api_key != "":
+            curr.execute(SQL)
+            if curr.fetchone() is not None: api_key_exist_in_db = True
 
-    if api_key == "" or not api_key_exist_in_db:
-        return make_response(jsonify({'error': 'ApiKey Missing or Wrong'}), 400)
-    else:
-        if len(quote) == 0:
-            abort(404)
-        return jsonify({
-            'quote': quote[1],
-            'writer': quote[2]
-        })
+        if api_key == "" or not api_key_exist_in_db:
+            return make_response(jsonify({'error': 'ApiKey Missing or Wrong'}), 400)
+        else:
+            if len(quote) == 0:
+                abort(404)
+            return jsonify({
+                'quote': quote[1],
+                'writer': quote[2]
+            })
  
 
 If user enters credential properly, these functions checks for ``api_key`` and returns quotes either with keyword or 
