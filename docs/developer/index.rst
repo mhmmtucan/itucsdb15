@@ -40,29 +40,29 @@ Since application both provides API service and user interface for web client, i
 Web Client and backend
 ^^^^^^^^^^^^^^^^^^^^^^
 
-..  code-block:: python
-    def get_quote_random():
-        SQL = "SELECT quote,writer FROM quotes,writers,categories WHERE (quotes.writer_id = writers.id) AND \
-                (quotes.category_id = categories.id) AND (categories.keyword NOT IN ('notfound')) ORDER BY random() LIMIT 1"
-        curr.execute(SQL)
-        quote = curr.fetchone()
-        return quote
-    def get_quote_with_keyword(keyword):
-        SQL = "SELECT EXISTS (SELECT 1 FROM categories,quotes WHERE (quotes.category_id = categories.id) AND (keyword = '{}'))".format(
-            keyword)
-        curr.execute(SQL)
-        category_exists = curr.fetchone()[0]
-        if not category_exists:
-            keyword = "notfound"
-            session['404'] = True
-        else:
-            session['404'] = False
-        SQL = "SELECT quotes.id,quote,writer FROM quotes,categories,writers WHERE (quotes.category_id = categories.id) AND \
-            (quotes.writer_id = writers.id) AND (keyword = '{}') ORDER BY random() LIMIT 1".format(
-            keyword)
-        curr.execute(SQL)
-        quote = curr.fetchone()
-        return quote
+.. code-block:: python
+  def get_quote_random():
+      SQL = "SELECT quote,writer FROM quotes,writers,categories WHERE (quotes.writer_id = writers.id) AND \
+              (quotes.category_id = categories.id) AND (categories.keyword NOT IN ('notfound')) ORDER BY random() LIMIT 1"
+      curr.execute(SQL)
+      quote = curr.fetchone()
+      return quote
+  def get_quote_with_keyword(keyword):
+      SQL = "SELECT EXISTS (SELECT 1 FROM categories,quotes WHERE (quotes.category_id = categories.id) AND (keyword = '{}'))".format(
+          keyword)
+      curr.execute(SQL)
+      category_exists = curr.fetchone()[0]
+      if not category_exists:
+          keyword = "notfound"
+          session['404'] = True
+      else:
+          session['404'] = False
+      SQL = "SELECT quotes.id,quote,writer FROM quotes,categories,writers WHERE (quotes.category_id = categories.id) AND \
+          (quotes.writer_id = writers.id) AND (keyword = '{}') ORDER BY random() LIMIT 1".format(
+          keyword)
+      curr.execute(SQL)
+      quote = curr.fetchone()
+      return quote
 
 The core of the applicaiton is served by these two function. These functions are called in ``home`` and ``random`` paths in order to generate quotes.
 ``get_quote_random()`` functions returns a randomly choosen quote from database. ``get_quote_with_keyword(keyword)`` function takes keyword as a parameter
@@ -71,30 +71,30 @@ than a key is held in the session in order to specify that quote with the keywor
 ``notfound``. This query returns one of the quotes which infrom users that given keyword is not exists.
 
 
-..  code-block:: python
-    @app.route('/', methods=['GET', 'POST'])
-    def keyword():
-        keyword = ""
-        if request.method == 'POST':
-            keyword = request.form.get('keyword')
-        elif request.method == 'GET':
-            SQL = "SELECT keyword FROM categories WHERE (keyword NOT IN ('notfound'))ORDER BY random() LIMIT 1"
-            curr.execute(SQL)
-            keyword = curr.fetchone()[0]
-        data = get_quote_with_keyword(keyword)
-        is_hidden = ''
-        is_logged = ''
-        if session.get('404'):
-            if session['404']:
-                is_hidden = 'hidden'
-            else:
-                is_hidden = ''
-        if session.get('user_logged'):
-            is_logged = ''
-        else:
-            is_logged = 'hidden'
-        return render_template('home.html', writer=data[2], quote=data[1], keyword_value=keyword, quote_id=data[0],
-                            isHidden=is_hidden, islogged=is_logged)
+.. code-block:: python
+  @app.route('/', methods=['GET', 'POST'])
+  def keyword():
+      keyword = ""
+      if request.method == 'POST':
+          keyword = request.form.get('keyword')
+      elif request.method == 'GET':
+          SQL = "SELECT keyword FROM categories WHERE (keyword NOT IN ('notfound'))ORDER BY random() LIMIT 1"
+          curr.execute(SQL)
+          keyword = curr.fetchone()[0]
+      data = get_quote_with_keyword(keyword)
+      is_hidden = ''
+      is_logged = ''
+      if session.get('404'):
+          if session['404']:
+              is_hidden = 'hidden'
+          else:
+              is_hidden = ''
+      if session.get('user_logged'):
+          is_logged = ''
+      else:
+          is_logged = 'hidden'
+      return render_template('home.html', writer=data[2], quote=data[1], keyword_value=keyword, quote_id=data[0],
+                          isHidden=is_hidden, islogged=is_logged)
 
 
 This code block executed when user reach the home page of the website. If it is the first time that user enters the site, since it is a GET request, function
