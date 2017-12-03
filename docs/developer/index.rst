@@ -73,6 +73,7 @@ and afterwards it checks whether keyword exists in database or not. If exists it
 than a key is held in the session in order to specify that quote with the keyword is not exists in database. Also, it makes a quote request with keyword
 ``notfound``. This query returns one of the quotes which infrom users that given keyword is not exists.
 
+------------
 
 .. code-block:: python
 
@@ -107,6 +108,7 @@ will choose randomly keyword excluding ``notfound`` category. After that a quote
 on the home page, then it will be a POST request. Because of this, rather than generating new keyword, keyword in the form field will be used. Also ``is_hidden`` and 
 ``is_logged`` session booleans are used for detecting whether user logged in or not. These way users will be prevented to send comments without logging in.
 
+------------
 
 .. code-block:: python
 
@@ -165,6 +167,7 @@ on the home page, then it will be a POST request. Because of this, rather than g
                     return render_template('generateKey.html', apikey=session['api_key'])
             else:
                 return render_template('auth.html')
+                
 
 This code block provides function to create account or login. If user created an account it will redirect user to authentication page.
 When user try to create an account if the input fields are valid, function will make a request to database in order to insert username. 
@@ -172,6 +175,8 @@ If username exists than it will prompt some error. It will also create an unique
 
 After creating an account user can enter using same username and password value. If error exists, than it will prompt some warnings in order to inform user. 
 Function will also keep some session variables in order to remember that user logged in.
+
+------------
 
 .. code-block:: python
 
@@ -233,7 +238,7 @@ Function will also keep some session variables in order to remember that user lo
 In this code blocks giving rating for quotes handled. With jquery post request the rating clicked by user will sent to ``giveRating()`` function.
 This function will use this information and update the votes and rating in the database for that specific quteo.
 
-
+------------
 
 .. code-block:: python
 
