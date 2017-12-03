@@ -1,8 +1,8 @@
-[![GitHub license](https://img.shields.io/github/license/mhmmtucan/itucsdb1741.svg)](https://github.com/mhmmtucan/itucsdb1741/blob/master/LICENSE)
+[![GitHub license](https://img.shields.io/github/license/mhmmtucan/itucsdb1741.svg)](https://github.com/mhmmtucan/itucsdb1741/blob/master/LICENSE) [![Documentation Status](https://readthedocs.org/projects/itucsdb1741/badge/?version=latest)](http://itucsdb1741.readthedocs.io/en/latest/?badge=latest)
 
 Generating quotes using keywords or randomly choosed.
 
-This repo provides an API service for generating quotes with given keywords. If user dont want to give an keywords, then API provide him and randomly choosen quote. The number of qoutes are restricted by the quotes in database.
+This repo provides an API service for generating quotes with given keywords. If user dont want to give a keywords, then API provide him randomly choosen quote. The number of qoutes are restricted by the quotes in database.
 
 ### Getting Started
 
