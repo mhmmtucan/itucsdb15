@@ -1,5 +1,6 @@
-User Guide
 ==========
+User Guide
+========== 
 
 Quote with Keyword
 ~~~~~~~~~~~~~~~~~~
@@ -22,6 +23,16 @@ related with the generated quote or they can give rating becuase they
 like the quote. These rating data will be used later in order to
 determine whether generated quote is good or not.
 
+
+Give Feedback
+^^^^^^^^^^^^^
+
+If user want to share opinion about quotes or they want to share what 
+is their thought about that they can share using Give Feedback button.
+Any type of comments can be send using that button. However in order to
+send comments users have to log in. Otherwise Give Feedback button will
+not appear.
+
 Randomly Choosen Quote
 ~~~~~~~~~~~~~~~~~~~~~~
 
@@ -39,8 +50,7 @@ menu link. Afterwards, with the given API key they can generate thier
 quotes either randomly or with given keyword.
 
 API Usage
-~~~~~~~~~
-
+^^^^^^^^^
 
 Before making a request user has to create credentials. In order to
 that, **Auth** menu link should be used. After creating and user account
