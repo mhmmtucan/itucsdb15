@@ -175,7 +175,7 @@ def auth_page():
             if username == "" or password == "":
                 return render_template('auth.html', prompt="Form field should be filled")
             elif user is None:
-                return render_template('auth.html', prompt="Are you sure about that username?")
+                return render_template('auth.html', prompt="Are you sure about that username / password?")
             else:
                 if password == user[2]:
                     session['api_key'] = user[3]
@@ -183,7 +183,7 @@ def auth_page():
                     session['user_logged'] = True
                     return redirect(url_for('generateKey'))
                 else:
-                    return render_template('auth.html', prompt="Password invalid.")
+                    return render_template('auth.html', prompt="Username / Password invalid.")
 
         elif request.form['btn'] == 'Create':
             # do create
@@ -196,8 +196,12 @@ def auth_page():
                 SQL = "INSERT INTO users (username, password, api_key) " \
                       "SELECT '{}', '{}', '{}' WHERE NOT EXISTS(SELECT id FROM users WHERE username='{}') RETURNING id;".format(
                     username, password, apikey, username)
-                curr.execute(SQL)
-                conn.commit()
+                try:
+                    curr.execute(SQL)
+                    conn.commit()
+                except psycopg2.DatabaseError:
+                    conn.rollback()
+
                 id = curr.fetchone()
                 if id is not None:
                     session['api_key'] = apikey
@@ -257,8 +261,12 @@ def giveRating():
     votes = votes + 1
 
     SQL = "UPDATE quotes SET rate={}, votes={} WHERE id={}".format(rate, votes, quote_id)
-    curr.execute(SQL)
-    conn.commit()
+    try:
+        curr.execute(SQL)
+        conn.commit()
+    except psycopg2.DatabaseError:
+        conn.rollback()
+
     return jsonify({
         'status': 'OK',
         'rating': star
@@ -273,8 +281,11 @@ def feedback():
 
     SQL = "INSERT INTO comments(user_id, quote_id, comment) VALUES ( (SELECT id FROM users WHERE username='{}'), {}, '{}')".format(
         username, quote_id, comment)
-    curr.execute(SQL)
-    conn.commit()
+    try:
+        curr.execute(SQL)
+        conn.commit()
+    except psycopg2.DatabaseError:
+        conn.rollback()
 
     return jsonify({
         'status': 'OK'
@@ -320,8 +331,12 @@ def addNew():
                     # writer is not in database
                     # insert writer than return id
                     SQL = "INSERT INTO writers(writer) VALUES ('{}') RETURNING id".format(writer)
-                    curr.execute(SQL)
-                    conn.commit()
+                    try:
+                        curr.execute(SQL)
+                        conn.commit()
+                    except psycopg2.DatabaseError:
+                        conn.rollback()
+
                     writer_id = curr.fetchone()[0]
 
                 SQL = "INSERT INTO quotes(quote, category_id, writer_id) VALUES ('{}', {}, {})".format(quote,
@@ -333,8 +348,11 @@ def addNew():
                   ((SELECT id FROM users WHERE username = '{}'),'{}','{}',(SELECT id FROM categories WHERE keyword = '{}'))".format(
                     username, quote, writer, keyword)
 
-            curr.execute(SQL)
-            conn.commit()
+            try:
+                curr.execute(SQL)
+                conn.commit()
+            except psycopg2.DatabaseError:
+                conn.rollback()
 
     return render_template("addNew.html", categoryList=categories, promptHidden=prompt_hidden, btnHidden=btn_hidden,
                            prompt='')
@@ -356,6 +374,7 @@ def demo():
                 data = "Tables created."
             except psycopg2.Error as e:
                 data = e.diag.message_primary
+                conn.rollback()
 
         elif request.form['btn'] == 'Insert':
             path = os.path.join(DEMO_DIR, 'insert.txt')
@@ -367,6 +386,7 @@ def demo():
                 data = "Tables inserted."
             except psycopg2.Error as e:
                 data = e.diag.message_primary
+                conn.rollback()
 
         elif request.form['btn'] == 'Update':
             path = os.path.join(DEMO_DIR, 'update.txt')
@@ -378,6 +398,7 @@ def demo():
                 data = "Update successful."
             except psycopg2.Error as e:
                 data = e.diag.message_primary
+                conn.rollback()
 
         elif request.form['btn'] == 'Select':
             path = os.path.join(DEMO_DIR, 'select.txt')
@@ -401,6 +422,7 @@ def demo():
                 data = "All tables deleted."
             except psycopg2.Error as e:
                 data = e.diag.message_primary
+                conn.rollback()
 
         return render_template("demo.html", result=data)
     elif request.method == 'GET':
@@ -433,11 +455,15 @@ if __name__ == '__main__':
              dbname='{}'""".format("", "", "localhost", 5432, "postgres")
         app.config['dsn'] = dsn
 
-    conn = psycopg2.connect(app.config['dsn'])
-    global curr
-    curr = conn.cursor()
+    try:
+        conn = psycopg2.connect(app.config['dsn'])
+        global curr
+        curr = conn.cursor()
+        app.run(host='0.0.0.0', port=int(port), debug=debug)
+        conn.commit()
+        curr.close()
+    except psycopg2.DatabaseError:
+        conn.rollback()
+    finally:
+        conn.close()
 
-    app.run(host='0.0.0.0', port=int(port), debug=debug)
-
-    conn.commit()
-    conn.close()
