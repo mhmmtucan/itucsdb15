@@ -7,9 +7,9 @@ Quote with Keyword
 
 In order to get a quote with given keyword, simply type the keyword in
 the box and hit generate button. If the quote with given keyword exists
-in database then result will be succesful. If there is no quote with
+in database then result will be successful. If there is no quote with
 given keyword then rather showing a 404 error or not found error,
-randomly choosen "404" quote will be displayed.
+randomly chosen "404" quote will be displayed.
 
 Below, there is an example of quote generating quote with keyword.
 
@@ -19,7 +19,7 @@ Rating
 ^^^^^^
 
 After generating quote user can rate a quote if the given keyword is
-related with the generated quote or they can give rating becuase they
+related with the generated quote or they can give rating because they
 like the quote. These rating data will be used later in order to
 determine whether generated quote is good or not.
 
@@ -33,7 +33,7 @@ Any type of comments can be send using that button. However in order to
 send comments users have to log in. Otherwise Give Feedback button will
 not appear.
 
-Randomly Choosen Quote
+Randomly Chosen Quote
 ~~~~~~~~~~~~~~~~~~~~~~
 
 If users don't have any particular keyword, still they can generate
