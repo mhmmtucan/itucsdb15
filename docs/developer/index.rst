@@ -8,7 +8,7 @@ Database Design
 
 The database includes six table. The 'users' table is for the users who want to use API service. The 'users' table holds the data for username, password and API key.
 
-The 'categories' table holds the avaliable categories in the database at that time. The id variable is unique for each category.
+The 'categories' table holds the available categories in the database at that time. The id variable is unique for each category.
 
 The 'writers' table holds the name of the the writers and the id variable is unique for each one.
 
@@ -67,11 +67,11 @@ Web Client and backend
         quote = curr.fetchone()
         return quote
 
-The core of the applicaiton is served by these two function. These functions are called in ``home`` and ``random`` paths in order to generate quotes.
-``get_quote_random()`` functions returns a randomly choosen quote from database. ``get_quote_with_keyword(keyword)`` function takes keyword as a parameter
-and afterwards it checks whether keyword exists in database or not. If exists it creates a query with the keyword and returns data from database. If not
+The core of the applicaiton is served by these two function. These functions are called in ``home`` and ``random`` routes in order to generate quotes.
+``get_quote_random()`` functions returns a randomly chosen quote from database. ``get_quote_with_keyword(keyword)`` function takes keyword as a parameter
+and afterwards it checks whether keyword exists in database or not. If exists, it creates a query with the keyword and returns data from database. If not
 than a key is held in the session in order to specify that quote with the keyword is not exists in database. Also, it makes a quote request with keyword
-``notfound``. This query returns one of the quotes which infrom users that given keyword is not exists.
+``notfound``. This query returns one of the quotes which infroms users that given keyword is not exists.
 
 ------------
 
@@ -309,7 +309,7 @@ This code block handles adding new quotes to database using web interface. It wi
 API Service
 ^^^^^^^^^^^
 
-API service require authentication and also gives some errors if some credential if absent. 
+API service require authentication and also gives some errors if some credential is absent. 
 Errors and necessity of authentication provided using these functions
 
 
@@ -364,7 +364,7 @@ Errors and necessity of authentication provided using these functions
             })
  
 
-If user enters credential properly, these functions checks for ``api_key`` and returns quotes either with keyword or 
+If user enters credential properly, these functions check for ``api_key`` and return quotes either with keyword or 
 randomly choosen as before. The ``get_quote_random()`` and ``get_quote_with_keyword()`` functions works as described in the web client part.
 
 
