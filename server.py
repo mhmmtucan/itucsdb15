@@ -140,7 +140,8 @@ def keyword():
             keyword = '_'
 
 
-    data = get_quote_with_keyword(keyword)
+    if keyword != '_':
+        data = get_quote_with_keyword(keyword)
     is_hidden = ''
     is_logged = ''
     if session.get('404'):
