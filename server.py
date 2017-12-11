@@ -131,8 +131,14 @@ def keyword():
         keyword = request.form.get('keyword')
     elif request.method == 'GET':
         SQL = "SELECT keyword FROM categories WHERE (keyword NOT IN ('notfound'))ORDER BY random() LIMIT 1"
-        curr.execute(SQL)
-        keyword = curr.fetchone()[0]
+        try:
+            curr.execute(SQL)
+            conn.commit()
+            keyword = curr.fetchone()[0]
+        except psycopg2.DatabaseError:
+            conn.rollback()
+            keyword = '_'
+
 
     data = get_quote_with_keyword(keyword)
     is_hidden = ''
@@ -146,8 +152,12 @@ def keyword():
         is_logged = ''
     else:
         is_logged = 'hidden'
-    return render_template('home.html', writer=data[2], quote=data[1], keyword_value=keyword, quote_id=data[0],
-                           isHidden=is_hidden, islogged=is_logged)
+    if keyword == '_':
+        return render_template('home.html', writer="please create database", quote="no database", keyword_value="", quote_id=0,
+                               isHidden=is_hidden, islogged=is_logged)
+    else:
+        return render_template('home.html', writer=data[2], quote=data[1], keyword_value=keyword, quote_id=data[0],
+                               isHidden=is_hidden, islogged=is_logged)
 
 
 @app.route('/random')
