@@ -472,7 +472,6 @@ if __name__ == '__main__':
         curr = conn.cursor()
         app.run(host='0.0.0.0', port=int(port), debug=debug)
         conn.commit()
-        curr.close()
     except psycopg2.DatabaseError:
         conn.rollback()
     finally:
